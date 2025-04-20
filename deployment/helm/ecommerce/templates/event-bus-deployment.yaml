@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.eventBus.name }}
+  labels:
+    app: {{ .Values.eventBus.name }}
+spec:
+  replicas: {{ .Values.eventBus.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.eventBus.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.eventBus.name }}
+    spec:
+      containers:
+        - name: {{ .Values.eventBus.name }}
+          image: "{{ .Values.eventBus.image.repository }}:{{ .Values.eventBus.image.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.eventBus.service.port }}
+          resources:
+            {{- toYaml .Values.eventBus.resources | nindent 12 }}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.global.environment }}
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://{{ .Values.serviceRegistry.name }}:{{ .Values.serviceRegistry.service.port }}/eureka/"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.eventBus.name }}
+  labels:
+    app: {{ .Values.eventBus.name }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.eventBus.service.port }}
+      targetPort: {{ .Values.eventBus.service.port }}
+      protocol: TCP
+      name: amqp
+  selector:
+    app: {{ .Values.eventBus.name }} 

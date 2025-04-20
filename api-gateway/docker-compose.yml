@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  kong-database:
+    image: postgres:15
+    container_name: kong-database
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kongpass
+    ports:
+      - "5431:5431"
+    volumes:
+      - kong_data:/var/lib/postgresql/data
+    networks:
+      - consul-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "kong"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kong-migration:
+    image: kong:3.9
+    command: kong migrations bootstrap --force
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+      KONG_PG_DATABASE: kong
+    networks:
+      - consul-network
+    restart: on-failure
+
+  kong:
+    image: kong:3.9
+    container_name: kong
+    restart: always
+    depends_on:
+      kong-database:
+        condition: service_healthy
+      kong-migration:
+        condition: service_completed_successfully
+    environment:
+      KONG_DATABASE: "off"  # Disable DB mode to use kong.yml
+      KONG_DECLARATIVE_CONFIG: /kong/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_PROXY_LISTEN: 0.0.0.0:8000, 0.0.0.0:8443 ssl
+      KONG_SSL: off
+      KONG_JWT_SECRET: "3V5+VVj6mnxtvejvkDXX9dD5Wb4trRHTs3wCph276Bn00JHoODjN8C32FPIqpfBFpcLWA67GKbMz7dA18EcnTfxaLXFilehZfqxcgPPmuzS4VUXpepO7HP4V0gMcCFZ5UB5zCoMNalfIqqQyAxQBYuGvrl7Pwg5ZjFmz4iO4GLyuIbSdNcexy9TsO8PT09Fx7tMHswp8Okd1ryvtrouZ64iOyqENqvmOTL+Op7apwYqVCs95ZWVg4Gq3dmgCQRBQHmTlUHr/7HnZ/MBrMk6a5r/r8w+3TNT3MF/b3m8hlemFwQSUvO3hNhnsooz1JuHYkwaQKUQ8+Q3VUkrRuKPsVs7wMcEqWNpoDoSy+pcZcqc="
+      KONG_JWT_ALGORITHM: "HS256"  # JWT algoritması
+    volumes:
+      - ./kong.yml:/kong/kong.yml:ro
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
+    networks:
+      - consul-network
+
+networks:
+  consul-network:
+    external: true
+
+volumes:
+  kong_data:

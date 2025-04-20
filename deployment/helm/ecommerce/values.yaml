@@ -1,0 +1,142 @@
+global:
+  environment: production
+
+apiGateway:
+  name: api-gateway
+  replicaCount: 1
+  image:
+    repository: haydarkose1/green-earn-api-gateway
+    tag: latest
+  service:
+    type: LoadBalancer
+    port: 8080
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+eventBus:
+  name: event-bus
+  replicaCount: 1
+  image:
+    repository: haydarkose1/green-earn-event-bus
+    tag: latest
+  service:
+    port: 5672
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+serviceRegistry:
+  name: service-registry
+  replicaCount: 1
+  image:
+    repository: haydarkose1/green-earn-service-registry
+    tag: latest
+  service:
+    port: 8761
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+# Mikroservisler
+authService:
+  name: auth-service
+  replicaCount: 1
+  image:
+    repository: haydarkose1/green-earn-auth-service
+    tag: latest
+  service:
+    port: 8082
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+mailService:
+  name: mail-service
+  replicaCount: 1
+  image:
+    repository: haydarkose1/green-earn-mail-service
+    tag: latest
+  service:
+    port: 8083
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+customerService:
+  name: customer-service
+  replicaCount: 1
+  image:
+    repository: haydarkose1
+    tag: latest
+  service:
+    port: 8089
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+elasticsearch:
+  enabled: true
+  name: elasticsearch
+  replicaCount: 1
+  image:
+    repository: docker.elastic.co/elasticsearch/elasticsearch
+    tag: 7.17.0
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+    adminPassword: admin
+
+authPostgres:
+  enabled: true
+  name: auth-postgres
+  replicaCount: 1
+  image:
+    repository: postgres
+    tag: 15
+  service:
+    port: 5432
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  persistence:
+    size: 1Gi 

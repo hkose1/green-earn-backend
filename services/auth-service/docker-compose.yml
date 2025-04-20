@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: auth-postgres
+    restart: on-failure
+    environment:
+      POSTGRES_DB: auth_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5430:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - consul-network
+
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: haydarkose1/green-earn-auth-service:latest
+    container_name: auth-service
+    restart: on-failure
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/auth_service
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER: true
+      SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_ENABLED: true
+      SPRING_CLOUD_CONSUL_CONFIG_ENABLED: false
+      SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_PATH: /actuator/health
+      SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_INTERVAL: 15s
+      SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_TIMEOUT: 5s
+      SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_CRITICAL_TIMEOUT: 30s
+    ports:
+      - "8081:8081"
+    networks:
+      - consul-network
+
+networks:
+  consul-network:
+    external: true
+volumes:
+  postgres-data:

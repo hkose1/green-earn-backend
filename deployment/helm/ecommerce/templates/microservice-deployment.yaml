@@ -1,0 +1,85 @@
+{{- define "microservice.deployment" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  labels:
+    app: {{ .name }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+    spec:
+      containers:
+        - name: {{ .name }}
+          image: "{{ .image.repository }}:{{ .image.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .service.port }}
+          resources:
+            {{- toYaml .resources | nindent 12 }}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ $.Values.global.environment }}
+            - name: SPRING_CLOUD_CONSUL_HOST
+              value: "{{ $.Values.serviceRegistry.name }}"
+            - name: SPRING_CLOUD_CONSUL_PORT
+              value: "{{ $.Values.serviceRegistry.service.port }}"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER
+              value: "true"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_ENABLED
+              value: "true"
+            - name: SPRING_CLOUD_CONSUL_CONFIG_ENABLED
+              value: "false"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_PATH
+              value: "/actuator/health"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_INTERVAL
+              value: "15s"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_TIMEOUT
+              value: "5s"
+            - name: SPRING_CLOUD_CONSUL_DISCOVERY_HEALTH_CHECK_CRITICAL_TIMEOUT
+              value: "30s"
+            - name: SPRING_RABBITMQ_HOST
+              value: "{{ $.Values.eventBus.name }}"
+            - name: SPRING_RABBITMQ_PORT
+              value: "{{ $.Values.eventBus.service.port }}"
+            - name: SPRING_RABBITMQ_USERNAME
+              value: "user"
+            - name: SPRING_RABBITMQ_PASSWORD
+              value: "password"
+            {{- if eq .name "auth-service" }}
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://{{ $.Values.authPostgres.name }}-service:{{ $.Values.authPostgres.service.port }}/auth_service"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.authPostgres.name }}-secret
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.authPostgres.name }}-secret
+                  key: password
+            {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  labels:
+    app: {{ .name }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .service.port }}
+      targetPort: {{ .service.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .name }}
+{{- end -}} 

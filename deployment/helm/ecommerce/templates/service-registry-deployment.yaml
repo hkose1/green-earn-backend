@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.serviceRegistry.name }}
+  labels:
+    app: {{ .Values.serviceRegistry.name }}
+spec:
+  replicas: {{ .Values.serviceRegistry.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.serviceRegistry.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.serviceRegistry.name }}
+    spec:
+      containers:
+        - name: {{ .Values.serviceRegistry.name }}
+          image: "{{ .Values.serviceRegistry.image.repository }}:{{ .Values.serviceRegistry.image.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.serviceRegistry.service.port }}
+          resources:
+            {{- toYaml .Values.serviceRegistry.resources | nindent 12 }}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.global.environment }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.serviceRegistry.name }}
+  labels:
+    app: {{ .Values.serviceRegistry.name }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.serviceRegistry.service.port }}
+      targetPort: {{ .Values.serviceRegistry.service.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Values.serviceRegistry.name }} 
