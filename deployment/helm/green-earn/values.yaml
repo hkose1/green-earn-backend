@@ -9,7 +9,7 @@ apiGateway:
     tag: latest
   service:
     type: LoadBalancer
-    port: 8080
+    port: 8000
   resources:
     limits:
       cpu: 500m
