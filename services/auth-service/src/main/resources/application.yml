@@ -2,9 +2,9 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:postgresql://auth-postgres-service:5432/auth_service
-    username: cG9zdGdyZXM=
-    password: cG9zdGdyZXM=
+    url: jdbc:postgresql://auth-postgres:5432/auth_service
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: update
