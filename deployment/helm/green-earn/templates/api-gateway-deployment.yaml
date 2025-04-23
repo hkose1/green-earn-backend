@@ -23,10 +23,26 @@ spec:
           resources:
             {{- toYaml .Values.apiGateway.resources | nindent 12 }}
           env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: {{ .Values.global.environment }}
-            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: "http://{{ .Values.serviceRegistry.name }}:{{ .Values.serviceRegistry.service.port }}/eureka/"
+            - name: KONG_DATABASE
+              value: "off"
+            - name: KONG_PROXY_ACCESS_LOG
+              value: "/dev/stdout"
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: "/dev/stdout"
+            - name: KONG_PROXY_ERROR_LOG
+              value: "/dev/stderr"
+            - name: KONG_ADMIN_ERROR_LOG
+              value: "/dev/stderr"
+            - name: KONG_ADMIN_LISTEN
+              value: "0.0.0.0:8001"
+          volumeMounts:
+            - name: kong-config
+              mountPath: /etc/kong/kong.yml
+              subPath: kong.yml
+      volumes:
+        - name: kong-config
+          configMap:
+            name: kong-config
 ---
 apiVersion: v1
 kind: Service
