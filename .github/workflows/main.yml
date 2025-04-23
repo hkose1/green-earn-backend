@@ -44,6 +44,12 @@ jobs:
             cd ../..
           }
           
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          
       - name: Build and Push Docker images
         run: |
           # Core services
@@ -60,8 +66,8 @@ jobs:
               if ($content -and $content.Trim() -ne "") {
                 cd "$service"
                 Write-Host "Building and pushing $service..."
-                docker build -t "haydarkose1/$($coreServices[$service]):latest" .
-                docker push "haydarkose1/$($coreServices[$service]):latest"
+                docker build -t "${{ secrets.DOCKER_HUB_USERNAME }}/$($coreServices[$service]):latest" .
+                docker push "${{ secrets.DOCKER_HUB_USERNAME }}/$($coreServices[$service]):latest"
                 cd ..
               }
             }
@@ -116,14 +122,19 @@ jobs:
           
       - name: Configure kubectl
         run: |
-
           echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
           $env:KUBECONFIG = "kubeconfig.yaml"
           
       - name: Deploy to Kubernetes
         run: |
-          cd deployment/helm
-          & "C:\Program Files\helm\windows-amd64\helm.exe" upgrade --install green-earn ./green-earn `
+          cd deployment/helm/ecommerce
+          & "C:\Program Files\helm\windows-amd64\helm.exe" upgrade --install green-earn . `
             --namespace green-earn `
             --create-namespace `
-            --set image.repository=haydarkose1 
+            --set global.environment=production `
+            --set apiGateway.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-api-gateway `
+            --set eventBus.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-event-bus `
+            --set serviceRegistry.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-service-registry `
+            --set authService.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-auth-service `
+            --set mailService.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-mail-service `
+            --set customerService.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-customer-service 
