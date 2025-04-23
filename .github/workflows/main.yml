@@ -127,7 +127,7 @@ jobs:
           
       - name: Deploy to Kubernetes
         run: |
-          cd deployment/helm/ecommerce
+          cd deployment/helm/green-earn
           & "C:\Program Files\helm\windows-amd64\helm.exe" upgrade --install green-earn . `
             --namespace green-earn `
             --create-namespace `
