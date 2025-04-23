@@ -41,7 +41,7 @@ serviceRegistry:
     repository: haydarkose1/green-earn-service-registry
     tag: latest
   service:
-    port: 8761
+    port: 8500
   resources:
     limits:
       cpu: 500m
@@ -58,7 +58,7 @@ authService:
     repository: haydarkose1/green-earn-auth-service
     tag: latest
   service:
-    port: 8082
+    port: 8081
   resources:
     limits:
       cpu: 500m
@@ -74,7 +74,7 @@ mailService:
     repository: haydarkose1/green-earn-mail-service
     tag: latest
   service:
-    port: 8083
+    port: 8082
   resources:
     limits:
       cpu: 500m
