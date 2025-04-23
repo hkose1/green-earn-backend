@@ -69,8 +69,8 @@ jobs:
           
           # Microservices
           $services = @(
-            "auth-service",
-            "mail-service",
+            "auth-service"
+            "mail-service"
           )
           
           foreach ($service in $services) {
