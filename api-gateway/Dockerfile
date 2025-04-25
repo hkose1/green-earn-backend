@@ -1,15 +1,17 @@
 FROM kong:latest
 
-ENV KONG_DATABASE=postgres
-ENV KONG_PG_HOST=kong-database
-ENV KONG_PG_PORT=5432
-ENV KONG_PORT_MAPS=8000:80
-ENV KONG_PORT_MAPS=8443:443
-ENV KONG_PORT_MAPS=8001:8001
-
+ENV KONG_DATABASE=off
+ENV KONG_DECLARATIVE_CONFIG=/etc/kong/kong.yml
+ENV KONG_PROXY_ACCESS_LOG=/dev/stdout
+ENV KONG_ADMIN_ACCESS_LOG=/dev/stdout
+ENV KONG_PROXY_ERROR_LOG=/dev/stderr
+ENV KONG_ADMIN_ERROR_LOG=/dev/stderr
 
 EXPOSE 8000 8443 8001
 
+RUN mkdir -p /usr/local/kong && \
+    touch /usr/local/kong/.kong_env
+
 COPY kong.yml /etc/kong/kong.yml
 
-CMD kong reload
+CMD ["kong", "start", "--vv"]
