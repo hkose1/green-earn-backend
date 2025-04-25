@@ -27,7 +27,7 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-postgres:5432/auth_service
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5430/auth_service
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_CLOUD_CONSUL_HOST: consul
