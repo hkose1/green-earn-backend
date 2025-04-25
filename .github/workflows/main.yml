@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 
-
 jobs:
   build-and-test:
     runs-on: self-hosted
@@ -18,6 +17,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: 'maven'
           
       - name: Install Maven
         run: |
@@ -32,15 +32,17 @@ jobs:
           
       - name: Build Java Services
         run: |
+          $ErrorActionPreference = "Stop"
+          
           if (Test-Path "services/mail-service/pom.xml") {
             cd services/mail-service
-            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install
+            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
             cd ../..
           }
           
           if (Test-Path "services/auth-service/pom.xml") {
             cd services/auth-service
-            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install
+            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
             cd ../..
           }
           
@@ -52,6 +54,8 @@ jobs:
           
       - name: Build and Push Docker images
         run: |
+          $ErrorActionPreference = "Stop"
+          
           # Core services
           $coreServices = @{
             "api-gateway" = "green-earn-api-gateway"
@@ -66,7 +70,7 @@ jobs:
               if ($content -and $content.Trim() -ne "") {
                 cd "$service"
                 Write-Host "Building and pushing $service..."
-                docker build -t "${{ secrets.DOCKER_HUB_USERNAME }}/$($coreServices[$service]):latest" .
+                docker build --no-cache -t "${{ secrets.DOCKER_HUB_USERNAME }}/$($coreServices[$service]):latest" .
                 docker push "${{ secrets.DOCKER_HUB_USERNAME }}/$($coreServices[$service]):latest"
                 cd ..
               }
@@ -87,7 +91,7 @@ jobs:
               if ($content -and $content.Trim() -ne "") {
                 Write-Host "Building and pushing $service..."
                 cd "services/$service"
-                docker compose build
+                docker compose build --no-cache
                 docker compose push
                 cd ../..
               }
@@ -103,6 +107,7 @@ jobs:
       
       - name: Install Helm
         run: |
+          $ErrorActionPreference = "Stop"
           $helmVersion = "3.14.2"
           $helmUrl = "https://get.helm.sh/helm-v$helmVersion-windows-amd64.zip"
           $helmZip = "helm.zip"
@@ -122,12 +127,19 @@ jobs:
           
       - name: Configure kubectl
         run: |
+          $ErrorActionPreference = "Stop"
           echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
           $env:KUBECONFIG = "kubeconfig.yaml"
           
       - name: Deploy to Kubernetes
         run: |
+          $ErrorActionPreference = "Stop"
           cd deployment/helm/green-earn
+          
+          # Önce namespace'i oluştur
+          kubectl create namespace green-earn --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Helm deployment
           & "C:\Program Files\helm\windows-amd64\helm.exe" upgrade --install green-earn . `
             --namespace green-earn `
             --create-namespace `
@@ -137,4 +149,8 @@ jobs:
             --set serviceRegistry.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-service-registry `
             --set authService.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-auth-service `
             --set mailService.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-mail-service `
-            --set customerService.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-customer-service 
+            --set customerService.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-customer-service `
+            --set authService.postgresql.enabled=true `
+            --set authService.postgresql.auth.username=postgres `
+            --set authService.postgresql.auth.password=postgres `
+            --set authService.postgresql.auth.database=auth_service 
