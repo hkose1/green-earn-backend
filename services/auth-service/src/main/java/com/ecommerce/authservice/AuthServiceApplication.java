@@ -21,19 +21,21 @@ public class AuthServiceApplication {
         SpringApplication.run(AuthServiceApplication.class, args);
     }
 
-//    @Bean
-//    public CommandLineRunner commandLineRunner(RoleRepository roleRepository) {
-//        return args -> {
-//            var userRole = new RoleEntity();
-//            userRole.setRole(Role.USER);
-//
-//            roleRepository.save(userRole);
-//
-//            var adminRole = new RoleEntity();
-//            adminRole.setRole(Role.ADMIN);
-//            roleRepository.save(adminRole);
-//        };
-//
-//    }
+   @Bean
+   public CommandLineRunner commandLineRunner(RoleRepository roleRepository) {
+       return args -> {
+            if (roleRepository.findByRole(Role.USER).isEmpty()) {
+            var userRole = new RoleEntity();
+            userRole.setRole(Role.USER);
+
+            roleRepository.save(userRole);
+            }
+            if (roleRepository.findByRole(Role.ADMIN).isEmpty()) {
+            var adminRole = new RoleEntity();
+            adminRole.setRole(Role.ADMIN);
+            roleRepository.save(adminRole);
+            }
+       };
+   }
 
 }
