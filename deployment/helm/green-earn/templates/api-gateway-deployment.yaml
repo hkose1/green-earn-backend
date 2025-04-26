@@ -38,6 +38,15 @@ data:
                 config:
                   secret_is_base64: true
                   key_claim_name: iss
+    plugins:
+      - name: cors
+        config:
+          origins: ["*"]
+          methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+          headers: ["Accept", "Authorization", "Content-Type"]
+          exposed_headers: ["Access-Control-Allow-Origin"]
+          credentials: true
+          max_age: 3600
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -79,6 +88,10 @@ spec:
               value: "/dev/stderr"
             - name: KONG_ADMIN_LISTEN
               value: "0.0.0.0:8001"
+            - name: KONG_LOG_LEVEL
+              value: "debug"
+            - name: KONG_PROXY_LISTEN
+              value: "0.0.0.0:8000"
           volumeMounts:
             - name: kong-config
               mountPath: /etc/kong/kong.yml
@@ -98,9 +111,13 @@ metadata:
 spec:
   type: {{ .Values.apiGateway.service.type }}
   ports:
-    - port: {{ .Values.apiGateway.service.port }}
-      targetPort: {{ .Values.apiGateway.service.port }}
+    - name: http
+      port: {{ .Values.apiGateway.service.port }}
       protocol: TCP
-      name: http
+      targetPort: {{ .Values.apiGateway.service.port }}
+    - name: admin
+      port: 8001
+      protocol: TCP
+      targetPort: 8001
   selector:
     app: {{ .Values.apiGateway.name }} 
