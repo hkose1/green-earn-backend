@@ -28,7 +28,7 @@ spring:
     properties:
       mail:
         mime:
-          charset: UTF
+          charset: UTF-8
         smtp:
           writetimeout: 30000
           connectiontimeout: 30000
@@ -37,6 +37,9 @@ spring:
           starttls:
             enable: true
             required: true
+          ssl:
+            enable: true
+            trust: "*"
     verify:
       host: ${VERIFY_EMAIL_HOST}
   datasource:
