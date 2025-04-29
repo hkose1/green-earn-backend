@@ -37,6 +37,7 @@ spec:
         resources:
           {{- toYaml .Values.mailService.resources | nindent 10 }}
 ---
+  
 apiVersion: v1
 kind: Service
 metadata:
