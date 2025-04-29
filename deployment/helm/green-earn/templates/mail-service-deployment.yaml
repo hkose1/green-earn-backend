@@ -34,6 +34,16 @@ spec:
           value: "guest"
         - name: SPRING_RABBITMQ_PASSWORD
           value: "guest"
+        - name: EMAIL_HOST
+          value: "smtp.gmail.com"
+        - name: EMAIL_PORT
+          value: "587"
+        - name: EMAIL_ID
+          value: "haydarkose86@gmail.com"
+        - name: EMAIL_PASSWORD
+          value: "ulmm osso whea dukd"
+        - name: VERIFY_EMAIL_HOST
+          value: "http://auth-service:{{ .Values.authService.service.port }}"
         resources:
           {{- toYaml .Values.mailService.resources | nindent 10 }}
 ---

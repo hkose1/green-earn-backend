@@ -37,9 +37,6 @@ spring:
           starttls:
             enable: true
             required: true
-          ssl:
-            enable: true
-            trust: "*"
     verify:
       host: ${VERIFY_EMAIL_HOST}
   datasource:
