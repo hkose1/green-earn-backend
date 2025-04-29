@@ -30,13 +30,16 @@ spring:
         mime:
           charset: UTF-8
         smtp:
-          writetimeout: 30000
-          connectiontimeout: 30000
-          timeout: 30000
+          writetimeout: 60000
+          connectiontimeout: 60000
+          timeout: 60000
           auth: true
           starttls:
             enable: true
             required: true
+          ssl:
+            enable: true
+            trust: smtp.gmail.com
     verify:
       host: ${VERIFY_EMAIL_HOST}
   datasource:
