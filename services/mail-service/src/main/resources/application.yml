@@ -38,7 +38,7 @@ spring:
             enable: true
             required: true
           ssl:
-            enable: false
+            enable: true
             trust: "*"
     verify:
       host: ${VERIFY_EMAIL_HOST}
