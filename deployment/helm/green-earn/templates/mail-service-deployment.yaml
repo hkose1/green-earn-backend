@@ -41,7 +41,7 @@ spec:
         - name: EMAIL_ID
           value: "haydarkose86@gmail.com"
         - name: EMAIL_PASSWORD
-          value: "ulmm osso whea dukd"
+          value: "dsak ckgs tndd okee"
         - name: VERIFY_EMAIL_HOST
           value: "http://auth-service:{{ .Values.authService.service.port }}"
         resources:

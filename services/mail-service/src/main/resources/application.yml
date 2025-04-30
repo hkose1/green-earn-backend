@@ -35,14 +35,11 @@ spring:
           timeout: 60000
           auth: true
           starttls:
-            enable: false
-            required: false
-          ssl:
             enable: true
+            required: true
+          ssl:
             trust: "smtp.gmail.com"
-          socketFactory:
-            class: javax.net.ssl.SSLSocketFactory
-            port: 465
+          
           
           
     verify:
@@ -73,9 +70,9 @@ SERVER_PORT: 8082
 AUTH_SERVER_PORT: 8081
 #Email Config
 EMAIL_HOST: smtp.gmail.com
-EMAIL_PORT: 465
+EMAIL_PORT: 587
 EMAIL_ID: haydarkose86@gmail.com
-EMAIL_PASSWORD: ulmm osso whea dukd
+EMAIL_PASSWORD: dsak ckgs tndd okee
 VERIFY_EMAIL_HOST: http://localhost:${AUTH_SERVER_PORT}
 server:
   port: ${SERVER_PORT}
