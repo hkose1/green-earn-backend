@@ -53,19 +53,9 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
           
-      - name: Debug ACR Login Server
-        run: |
-          Write-Host "ACR Login Server: ${{ secrets.ACR_LOGIN_SERVER }}"
-          
       - name: Build and Push Docker images
         run: |
           $ErrorActionPreference = "Stop"
-          $acrLoginServer = "${{ secrets.ACR_LOGIN_SERVER }}"
-          
-          if (-not $acrLoginServer) {
-            Write-Error "ACR_LOGIN_SERVER secret is not set or empty"
-            exit 1
-          }
           
           # Core services
           $coreServices = @{
@@ -81,7 +71,7 @@ jobs:
               if ($content -and $content.Trim() -ne "") {
                 cd "$service"
                 Write-Host "Building and pushing $service..."
-                $imageName = "$acrLoginServer/$($coreServices[$service]):latest"
+                $imageName = "${{ secrets.ACR_LOGIN_SERVER }}/$($coreServices[$service]):latest"
                 Write-Host "Image name: $imageName"
                 docker build --no-cache -t $imageName .
                 docker push $imageName
@@ -103,7 +93,8 @@ jobs:
               if ($content -and $content.Trim() -ne "") {
                 Write-Host "Building and pushing $service..."
                 cd "services/$service"
-                $imageName = "$acrLoginServer/green-earn-$service:latest"
+                $fullServiceName = "green-earn-$service"
+                $imageName = "${{ secrets.ACR_LOGIN_SERVER }}/$fullServiceName:latest"
                 Write-Host "Image name: $imageName"
                 docker build --no-cache -t $imageName .
                 docker push $imageName
