@@ -125,11 +125,25 @@ jobs:
           
           & "$helmPath\helm.exe" version
           
+d       - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Get AKS Credentials
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+          
       - name: Configure kubectl
         run: |
           $ErrorActionPreference = "Stop"
-          echo "${{ secrets.KUBE_CONFIG_AKS }}" > kubeconfig.yaml
-          $env:KUBECONFIG = "kubeconfig.yaml"
+          
+          # Cluster bağlantısını test et
+          Write-Host "Testing cluster connection..."
+          kubectl config get-contexts
+          kubectl cluster-info
           
       - name: Deploy to Kubernetes
         run: |
