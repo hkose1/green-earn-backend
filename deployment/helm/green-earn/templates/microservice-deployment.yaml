@@ -53,19 +53,33 @@ spec:
             - name: SPRING_RABBITMQ_PASSWORD
               value: "password"
             {{- if eq .name "auth-service" }}
-            - name: SPRING_DATASOURCE_URL
-              value: "jdbc:postgresql://{{ $.Values.authPostgres.name }}-service:{{ $.Values.authPostgres.service.port }}/auth_service"
+            - name: SPRING_DATASOURCE_HOST
+              value: "{{ $.Values.authService.env.SPRING_DATASOURCE_HOST }}"
+            - name: SPRING_DATASOURCE_PORT
+              value: "{{ $.Values.authService.env.SPRING_DATASOURCE_PORT }}"
+            - name: SPRING_DATASOURCE_DATABASE
+              value: "{{ $.Values.authService.env.SPRING_DATASOURCE_DATABASE }}"
             - name: SPRING_DATASOURCE_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $.Values.authPostgres.name }}-secret
-                  key: username
+              value: "{{ $.Values.authService.env.SPRING_DATASOURCE_USERNAME }}"
             - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $.Values.authPostgres.name }}-secret
-                  key: password
+              value: "{{ $.Values.authService.env.SPRING_DATASOURCE_PASSWORD }}"
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: "{{ $.Values.authService.env.SPRING_JPA_HIBERNATE_DDL_AUTO }}"
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: "{{ $.Values.authService.env.SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT }}"
             {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .service.port }}
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .service.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
