@@ -80,27 +80,22 @@ jobs:
             }
           }
           
-          # Microservices
-          $services = @(
-            "auth-service"
-            "mail-service"
-          )
+          # Build and push auth-service
+          if (Test-Path "services/auth-service/Dockerfile") {
+            Write-Host "Building and pushing auth-service..."
+            cd services/auth-service
+            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service:latest" .
+            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service:latest"
+            cd ../..
+          }
           
-          foreach ($service in $services) {
-            $dockerfilePath = "services/$service/Dockerfile"
-            if (Test-Path $dockerfilePath) {
-              $content = Get-Content $dockerfilePath -Raw
-              if ($content -and $content.Trim() -ne "") {
-                Write-Host "Building and pushing $service..."
-                cd "services/$service"
-                $fullServiceName = "green-earn-$service"
-                $imageName = "${{ secrets.ACR_LOGIN_SERVER }}/$fullServiceName:latest"
-                Write-Host "Image name: $imageName"
-                docker build --no-cache -t $imageName .
-                docker push $imageName
-                cd ../..
-              }
-            }
+          # Build and push mail-service
+          if (Test-Path "services/mail-service/Dockerfile") {
+            Write-Host "Building and pushing mail-service..."
+            cd services/mail-service
+            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service:latest" .
+            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service:latest"
+            cd ../..
           }
 
   deploy:
