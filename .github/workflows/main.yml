@@ -46,11 +46,12 @@ jobs:
             cd ../..
           }
           
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v1
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
           
       - name: Build and Push Docker images
         run: |
@@ -70,8 +71,8 @@ jobs:
               if ($content -and $content.Trim() -ne "") {
                 cd "$service"
                 Write-Host "Building and pushing $service..."
-                docker build --no-cache -t "${{ secrets.DOCKER_HUB_USERNAME }}/$($coreServices[$service]):latest" .
-                docker push "${{ secrets.DOCKER_HUB_USERNAME }}/$($coreServices[$service]):latest"
+                docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/$($coreServices[$service]):latest" .
+                docker push "${{ secrets.ACR_LOGIN_SERVER }}/$($coreServices[$service]):latest"
                 cd ..
               }
             }
@@ -91,8 +92,8 @@ jobs:
               if ($content -and $content.Trim() -ne "") {
                 Write-Host "Building and pushing $service..."
                 cd "services/$service"
-                docker compose build --no-cache
-                docker compose push
+                docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-$service:latest" .
+                docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-$service:latest"
                 cd ../..
               }
             }
@@ -128,7 +129,7 @@ jobs:
       - name: Configure kubectl
         run: |
           $ErrorActionPreference = "Stop"
-          echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
+          echo "${{ secrets.KUBE_CONFIG_AKS }}" > kubeconfig.yaml
           $env:KUBECONFIG = "kubeconfig.yaml"
           
       - name: Deploy to Kubernetes
@@ -144,12 +145,12 @@ jobs:
             --namespace green-earn `
             --create-namespace `
             --set global.environment=production `
-            --set apiGateway.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-api-gateway `
-            --set eventBus.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-event-bus `
-            --set serviceRegistry.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-service-registry `
-            --set authService.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-auth-service `
-            --set mailService.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-mail-service `
-            --set customerService.image.repository=${{ secrets.DOCKER_HUB_USERNAME }}/green-earn-customer-service `
+            --set apiGateway.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-api-gateway `
+            --set eventBus.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-event-bus `
+            --set serviceRegistry.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-service-registry `
+            --set authService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service `
+            --set mailService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service `
+            --set customerService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service `
             --set authService.postgresql.enabled=true `
             --set authService.postgresql.auth.username=postgres `
             --set authService.postgresql.auth.password=postgres `

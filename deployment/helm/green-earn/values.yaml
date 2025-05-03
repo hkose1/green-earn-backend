@@ -5,7 +5,7 @@ apiGateway:
   name: api-gateway
   replicaCount: 1
   image:
-    repository: haydarkose1/green-earn-api-gateway
+    repository: {{ .Values.global.acrLoginServer }}/green-earn-api-gateway
     tag: latest
   service:
     type: LoadBalancer
@@ -22,7 +22,7 @@ eventBus:
   name: event-bus
   replicaCount: 1
   image:
-    repository: haydarkose1/green-earn-event-bus
+    repository: {{ .Values.global.acrLoginServer }}/green-earn-event-bus
     tag: latest
   service:
     port: 5672
@@ -38,7 +38,7 @@ serviceRegistry:
   name: service-registry
   replicaCount: 1
   image:
-    repository: haydarkose1/green-earn-service-registry
+    repository: {{ .Values.global.acrLoginServer }}/green-earn-service-registry
     tag: latest
   service:
     port: 8500
@@ -56,7 +56,7 @@ authService:
   name: auth-service
   replicaCount: 1
   image:
-    repository: haydarkose1/green-earn-auth-service
+    repository: {{ .Values.global.acrLoginServer }}/green-earn-auth-service
     tag: latest
   service:
     port: 8081
@@ -72,7 +72,7 @@ mailService:
   name: mail-service
   replicaCount: 1
   image:
-    repository: haydarkose1/green-earn-mail-service
+    repository: {{ .Values.global.acrLoginServer }}/green-earn-mail-service
     tag: latest
   service:
     port: 8082
@@ -88,7 +88,7 @@ customerService:
   name: customer-service
   replicaCount: 1
   image:
-    repository: haydarkose1
+    repository: {{ .Values.global.acrLoginServer }}/green-earn-customer-service
     tag: latest
   service:
     port: 8089
