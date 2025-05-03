@@ -153,6 +153,16 @@ jobs:
           # Önce namespace'i oluştur
           kubectl create namespace green-earn --dry-run=client -o yaml | kubectl apply -f -
           
+          # PostgreSQL secret'ını oluştur
+          Write-Host "Creating PostgreSQL secret..."
+          kubectl create secret generic azure-postgres-secret \
+            --from-literal=host=${{ secrets.AZURE_POSTGRES_HOST }} \
+            --from-literal=port=${{ secrets.AZURE_POSTGRES_PORT }} \
+            --from-literal=database=${{ secrets.AZURE_POSTGRES_DATABASE }} \
+            --from-literal=username=${{ secrets.AZURE_POSTGRES_USERNAME }} \
+            --from-literal=password=${{ secrets.AZURE_POSTGRES_PASSWORD }} \
+            -n green-earn --dry-run=client -o yaml | kubectl apply -f -
+          
           # Mevcut ConfigMap'leri sil
           Write-Host "Deleting existing ConfigMaps..."
           kubectl delete configmap kong-config -n green-earn --ignore-not-found
