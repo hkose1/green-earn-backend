@@ -54,19 +54,34 @@ spec:
               value: "password"
             {{- if eq .name "auth-service" }}
             - name: SPRING_DATASOURCE_HOST
-              value: "{{ $.Values.authService.env.SPRING_DATASOURCE_HOST }}"
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: host
             - name: SPRING_DATASOURCE_PORT
-              value: "{{ $.Values.authService.env.SPRING_DATASOURCE_PORT }}"
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: port
             - name: SPRING_DATASOURCE_DATABASE
-              value: "{{ $.Values.authService.env.SPRING_DATASOURCE_DATABASE }}"
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: database
             - name: SPRING_DATASOURCE_USERNAME
-              value: "{{ $.Values.authService.env.SPRING_DATASOURCE_USERNAME }}"
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: username
             - name: SPRING_DATASOURCE_PASSWORD
-              value: "{{ $.Values.authService.env.SPRING_DATASOURCE_PASSWORD }}"
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: password
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-              value: "{{ $.Values.authService.env.SPRING_JPA_HIBERNATE_DDL_AUTO }}"
+              value: "update"
             - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
-              value: "{{ $.Values.authService.env.SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT }}"
+              value: "org.hibernate.dialect.PostgreSQLDialect"
             {{- end }}
           livenessProbe:
             httpGet:
