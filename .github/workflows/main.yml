@@ -153,6 +153,10 @@ jobs:
           # Önce namespace'i oluştur
           kubectl create namespace green-earn --dry-run=client -o yaml | kubectl apply -f -
           
+          # Mevcut ConfigMap'leri sil
+          Write-Host "Deleting existing ConfigMaps..."
+          kubectl delete configmap kong-config -n green-earn --ignore-not-found
+          
           # Helm deployment
           & "C:\Program Files\helm\windows-amd64\helm.exe" upgrade --install green-earn . `
             --namespace green-earn `
