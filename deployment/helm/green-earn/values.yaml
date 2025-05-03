@@ -50,7 +50,6 @@ serviceRegistry:
     requests:
       cpu: 200m
       memory: 256Mi
-      
 
 # Mikroservisler
 authService:
@@ -68,6 +67,26 @@ authService:
     requests:
       cpu: 200m
       memory: 256Mi
+  env:
+    SPRING_DATASOURCE_HOST: ${{ secrets.AZURE_POSTGRES_HOST }}
+    SPRING_DATASOURCE_PORT: "5432"
+    SPRING_DATASOURCE_DATABASE: ${{ secrets.AZURE_POSTGRES_DATABASE }}
+    SPRING_DATASOURCE_USERNAME: ${{ secrets.AZURE_POSTGRES_USERNAME }}
+    SPRING_DATASOURCE_PASSWORD: ${{ secrets.AZURE_POSTGRES_PASSWORD }}
+    SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+  livenessProbe:
+    httpGet:
+      path: /actuator/health
+      port: 8081
+    initialDelaySeconds: 60
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /actuator/health
+      port: 8081
+    initialDelaySeconds: 30
+    periodSeconds: 10
 
 mailService:
   name: mail-service
@@ -122,23 +141,4 @@ monitoring:
     enabled: true
   grafana:
     enabled: true
-    adminPassword: admin
-
-authPostgres:
-  enabled: true
-  name: auth-postgres
-  replicaCount: 1
-  image:
-    repository: postgres
-    tag: 15
-  service:
-    port: 5432
-  resources:
-    limits:
-      cpu: 500m
-      memory: 512Mi
-    requests:
-      cpu: 200m
-      memory: 256Mi
-  persistence:
-    size: 1Gi 
+    adminPassword: admin 

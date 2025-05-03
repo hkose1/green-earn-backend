@@ -168,8 +168,4 @@ jobs:
             --set serviceRegistry.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-service-registry `
             --set authService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service `
             --set mailService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service `
-            --set customerService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service `
-            --set authService.postgresql.enabled=true `
-            --set authService.postgresql.auth.username=postgres `
-            --set authService.postgresql.auth.password=postgres `
-            --set authService.postgresql.auth.database=auth_service 
+            --set customerService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service 
