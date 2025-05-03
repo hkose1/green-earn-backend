@@ -2,9 +2,9 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5432}/${SPRING_DATASOURCE_DATABASE:auth_service}?sslmode=require
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    url: jdbc:postgresql://pg-azure.postgres.database.azure.com:5432/auth_service?sslmode=require
+    username: useradmin@pg-azure
+    password: c0d3!W3.BLacK
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
