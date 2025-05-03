@@ -1,11 +1,12 @@
 global:
   environment: production
+  acrLoginServer: ${{ secrets.ACR_LOGIN_SERVER }}
 
 apiGateway:
   name: api-gateway
   replicaCount: 1
   image:
-    repository: {{ .Values.global.acrLoginServer }}/green-earn-api-gateway
+    repository: ${{ secrets.ACR_LOGIN_SERVER }}/green-earn-api-gateway
     tag: latest
   service:
     type: LoadBalancer
@@ -22,7 +23,7 @@ eventBus:
   name: event-bus
   replicaCount: 1
   image:
-    repository: {{ .Values.global.acrLoginServer }}/green-earn-event-bus
+    repository: ${{ secrets.ACR_LOGIN_SERVER }}/green-earn-event-bus
     tag: latest
   service:
     port: 5672
@@ -38,7 +39,7 @@ serviceRegistry:
   name: service-registry
   replicaCount: 1
   image:
-    repository: {{ .Values.global.acrLoginServer }}/green-earn-service-registry
+    repository: ${{ secrets.ACR_LOGIN_SERVER }}/green-earn-service-registry
     tag: latest
   service:
     port: 8500
@@ -56,7 +57,7 @@ authService:
   name: auth-service
   replicaCount: 1
   image:
-    repository: {{ .Values.global.acrLoginServer }}/green-earn-auth-service
+    repository: ${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service
     tag: latest
   service:
     port: 8081
@@ -72,7 +73,7 @@ mailService:
   name: mail-service
   replicaCount: 1
   image:
-    repository: {{ .Values.global.acrLoginServer }}/green-earn-mail-service
+    repository: ${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service
     tag: latest
   service:
     port: 8082
@@ -88,7 +89,7 @@ customerService:
   name: customer-service
   replicaCount: 1
   image:
-    repository: {{ .Values.global.acrLoginServer }}/green-earn-customer-service
+    repository: ${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service
     tag: latest
   service:
     port: 8089
