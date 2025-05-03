@@ -71,8 +71,10 @@ jobs:
               if ($content -and $content.Trim() -ne "") {
                 cd "$service"
                 Write-Host "Building and pushing $service..."
-                docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/$($coreServices[$service]):latest" .
-                docker push "${{ secrets.ACR_LOGIN_SERVER }}/$($coreServices[$service]):latest"
+                $imageName = "${{ secrets.ACR_LOGIN_SERVER }}/$($coreServices[$service]):latest"
+                Write-Host "Image name: $imageName"
+                docker build --no-cache -t $imageName .
+                docker push $imageName
                 cd ..
               }
             }
@@ -86,14 +88,15 @@ jobs:
           
           foreach ($service in $services) {
             $dockerfilePath = "services/$service/Dockerfile"
-            $dockerComposePath = "services/$service/docker-compose.yml"
             if (Test-Path $dockerfilePath) {
               $content = Get-Content $dockerfilePath -Raw
               if ($content -and $content.Trim() -ne "") {
                 Write-Host "Building and pushing $service..."
                 cd "services/$service"
-                docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-$service:latest" .
-                docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-$service:latest"
+                $imageName = "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-$service:latest"
+                Write-Host "Image name: $imageName"
+                docker build --no-cache -t $imageName .
+                docker push $imageName
                 cd ../..
               }
             }
@@ -145,6 +148,7 @@ jobs:
             --namespace green-earn `
             --create-namespace `
             --set global.environment=production `
+            --set global.acrLoginServer=${{ secrets.ACR_LOGIN_SERVER }} `
             --set apiGateway.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-api-gateway `
             --set eventBus.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-event-bus `
             --set serviceRegistry.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-service-registry `
