@@ -68,11 +68,12 @@ management:
 
 SERVER_PORT: 8082
 AUTH_SERVER_PORT: 8081
+API_GATEWAY_PORT: 8000
 #Email Config
 EMAIL_HOST: smtp.gmail.com
 EMAIL_PORT: 587
 EMAIL_ID: haydarkose86@gmail.com
 EMAIL_PASSWORD: dsak ckgs tndd okee
-VERIFY_EMAIL_HOST: http://localhost:${AUTH_SERVER_PORT}
+VERIFY_EMAIL_HOST: http://57.151.52.238:${API_GATEWAY_PORT}
 server:
   port: ${SERVER_PORT}
