@@ -8,8 +8,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -90,25 +92,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthResponse login(AuthRequest authRequest) {
+        userRepository.findByEmail(authRequest.getEmail())
+                .orElseThrow(() -> new ApiException("No account found for this email"));
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     authRequest.getEmail(),
                     authRequest.getPassword()
             ));
-        } catch (Exception e) {
-            if (e instanceof DisabledException subEx) {
-                throw new UserNotVerifiedException();
-            }
-        }
 
-        final UserEntity user = userRepository.findByEmail(authRequest.getEmail())
-                .orElseThrow(() -> new ApiException("No account found for this email"));
-        if (!user.getEnabled()) {
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+            final String jwtToken = jwtService.generateToken(userDetails);
+            return AuthResponse.builder().token(jwtToken).build();
+
+        } catch (DisabledException e) {
             throw new UserNotVerifiedException();
+        } catch (BadCredentialsException e) {
+            throw new ApiException("Invalid email or password");
+        } catch (Exception e) {
+            throw new ApiException("Authentication failed");
         }
-
-        final String jwtToken = jwtService.generateToken(new UserDetailsImpl(user));
-        return AuthResponse.builder().token(jwtToken).build();
     }
 
 

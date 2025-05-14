@@ -30,15 +30,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new ApiException("There is no user registered with this email"));
 
         RoleEntity role = user.getRole();
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(Constants.ROLE_PREFIX + role.getRole().name()));
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                user.getEnabled(),
-                user.getAccountNonExpired(),
-                true,
-                user.getAccountNonLocked(),
-                authorities);
+        List<GrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority(Constants.ROLE_PREFIX + role.getRole().name())
+        );
+
+        return new UserDetailsImpl(user, authorities);
     }
 }
