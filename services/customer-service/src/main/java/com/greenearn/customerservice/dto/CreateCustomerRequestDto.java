@@ -1,0 +1,23 @@
+package com.greenearn.customerservice.dto;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Getter
+@Setter
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Builder
+public class CreateCustomerRequestDto {
+    @NotEmpty(message = "User id can not be null or empty")
+    private UUID userId;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private LocalDateTime createdAt;
+}

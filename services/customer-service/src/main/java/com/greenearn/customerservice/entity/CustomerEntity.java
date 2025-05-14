@@ -15,6 +15,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class CustomerEntity extends Auditable {
 
+    @Column(name = "user_id", nullable = false, unique = true)
     private UUID userId;
     private String firstName;
     private String lastName;
