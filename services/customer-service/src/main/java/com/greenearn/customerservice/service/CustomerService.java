@@ -1,6 +1,7 @@
 package com.greenearn.customerservice.service;
 
 
+import com.greenearn.customerservice.dto.BottleTransactionRequestDto;
 import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
 import com.greenearn.customerservice.entity.CustomerEntity;
 import com.greenearn.customerservice.entity.CustomerPointEntity;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
@@ -35,6 +37,22 @@ public class CustomerService {
             throw new RuntimeException("Customer already exists with user id: " + createCustomerRequestDto.getUserId());
         }
     }
+
+    @Transactional
+    public void updateCustomerPointsOnBottleTransaction(BottleTransactionRequestDto bottleTransactionRequestDto) {
+        Optional<CustomerEntity> customer = customerRepository.findById(bottleTransactionRequestDto.getCustomerId());
+        if (!customer.isPresent()) {
+            throw new RuntimeException("Customer does not exist with user id: " + bottleTransactionRequestDto.getCustomerId());
+        }
+        CustomerPointEntity customerPoint = customer.get().getCustomerPoint();
+        customerPoint.setTotalPoints(customerPoint.getTotalPoints() + bottleTransactionRequestDto.getPoints());
+        customerPoint.setTotalNumberOfSmallBottles(customerPoint.getTotalNumberOfSmallBottles() + bottleTransactionRequestDto.getNumberOfSmallBottles());
+        customerPoint.setTotalNumberOfMediumBottles(customerPoint.getTotalNumberOfMediumBottles() + bottleTransactionRequestDto.getNumberOfMediumBottles());
+        customerPoint.setTotalNumberOfLargeBottles(customerPoint.getTotalNumberOfLargeBottles() + bottleTransactionRequestDto.getNumberOfLargeBottles());
+        customer.get().setCustomerPoint(customerPoint);
+        customerRepository.save(customer.get());
+    }
+
 
     private CustomerPointEntity initializeCustomerPointEntity() {
         CustomerPointEntity customerPointEntity = new CustomerPointEntity();

@@ -3,6 +3,8 @@ package com.greenearn.customerservice.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.greenearn.customerservice.enums.BottleTransactionStatus;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 
 import java.util.UUID;
@@ -17,6 +19,7 @@ import java.util.UUID;
 public class BottleTransactionEntity extends Auditable {
     private UUID customerId;
     private UUID containerId;
+    @Enumerated(EnumType.STRING)
     private BottleTransactionStatus bottleTransactionStatus;
     private Integer numberOfSmallBottles;
     private Integer numberOfMediumBottles;

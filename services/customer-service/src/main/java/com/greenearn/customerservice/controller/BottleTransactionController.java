@@ -1,9 +1,8 @@
 package com.greenearn.customerservice.controller;
 
 
-import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
-import com.greenearn.customerservice.dto.CustomerResponseDto;
-import com.greenearn.customerservice.service.CustomerService;
+import com.greenearn.customerservice.dto.BottleTransactionRequestDto;
+import com.greenearn.customerservice.service.BottleTransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,19 +13,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Timestamp;
-
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/customers")
+@RequestMapping("/api/bottle-transactions")
 @Slf4j
-public class CustomerController {
+public class BottleTransactionController {
 
-    private final CustomerService customerService;
+    private final BottleTransactionService bottleTransactionService;
 
     @PostMapping
-    public ResponseEntity<Void> createCustomer(@RequestBody @Validated CreateCustomerRequestDto createCustomerRequestDto) {
-        customerService.createCustomer(createCustomerRequestDto);
+    public ResponseEntity<Void> createBottleTransaction(@RequestBody @Validated BottleTransactionRequestDto bottleTransactionRequestDto) {
+        bottleTransactionService.createBottleTransaction(bottleTransactionRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
