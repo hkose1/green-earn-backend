@@ -1,5 +1,6 @@
 package com.greenearn.authservice.mapper;
 
+import com.greenearn.authservice.client.request.CreateCustomerRequestDto;
 import org.springframework.stereotype.Component;
 
 import com.greenearn.authservice.dto.UserDto;
@@ -31,5 +32,16 @@ public class UserMapper {
         return entities.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+    }
+
+    public CreateCustomerRequestDto mapEntityToCreateCustomerRequestDto(UserEntity entity) {
+        if (entity == null) return null;
+        return CreateCustomerRequestDto.builder()
+                .userId(entity.getId())
+                .firstName(entity.getFirstname())
+                .lastName(entity.getLastname())
+                .email(entity.getEmail())
+                .createdAt(entity.getCreatedAt())
+                .build();
     }
 } 
