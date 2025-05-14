@@ -1,5 +1,8 @@
 package com.greenearn.authservice.service.impl;
 
+import com.greenearn.authservice.client.CustomerServiceClient;
+import com.greenearn.authservice.client.request.CreateCustomerRequestDto;
+import com.greenearn.authservice.mapper.UserMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     @Override
+    @Transactional
     public void registerUser(SignupRequest signupRequest) {
 
         if (!signupRequest.getPassword().equals(signupRequest.getConfirmPassword())) {
@@ -68,6 +72,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         confirmationRepository.save(confirmationEntity);
         CodeConfirmationEntity codeConfirmationEntity = new CodeConfirmationEntity(userEntity);
         codeConfirmationRepository.save(codeConfirmationEntity);
+        eventPublisher.publishEvent(
+                new UserEvent(
+                        userEntity,
+                        EventType.CREATE_CUSTOMER,
+                        Map.of()
+                )
+        );
         eventPublisher.publishEvent(
                 new UserEvent(
                         userEntity,

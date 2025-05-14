@@ -2,5 +2,6 @@ package com.greenearn.authservice.enums;
 
 public enum EventType {
     REGISTRATION,
-    RESET_PASSWORD
+    RESET_PASSWORD,
+    CREATE_CUSTOMER
 }
