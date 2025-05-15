@@ -3,6 +3,7 @@ package com.greenearn.customerservice.controller;
 
 import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
 import com.greenearn.customerservice.dto.CustomerResponseDto;
+import com.greenearn.customerservice.service.CurrentCustomerService;
 import com.greenearn.customerservice.service.CustomerService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +25,11 @@ import java.util.UUID;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final CurrentCustomerService currentCustomerService;
 
     @GetMapping("/me")
     public ResponseEntity<CustomerResponseDto> getCurrentCustomer(Authentication authentication) {
-        return ResponseEntity.ok(customerService.getCurrentCustomer(authentication));
+        return ResponseEntity.ok(currentCustomerService.getCurrentCustomer(authentication));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

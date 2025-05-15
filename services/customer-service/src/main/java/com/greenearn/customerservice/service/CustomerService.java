@@ -12,7 +12,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final CurrentCustomerService currentCustomerService;
 
     public void createCustomer(CreateCustomerRequestDto createCustomerRequestDto) {
         Optional<CustomerEntity> customer = customerRepository
@@ -44,18 +44,24 @@ public class CustomerService {
     }
 
     @Transactional
-    public void updateCustomerPointsOnBottleTransaction(BottleTransactionRequestDto bottleTransactionRequestDto) {
-        Optional<CustomerEntity> customer = customerRepository.findById(bottleTransactionRequestDto.getCustomerId());
+    public void updateCustomerPointsOnBottleTransaction(BottleTransactionRequestDto bottleTransactionRequestDto, Authentication authentication) {
+        final UUID customerId = currentCustomerService.getCurrentCustomerId(authentication);
+        Optional<CustomerEntity> customer = customerRepository.findById(customerId);
         if (!customer.isPresent()) {
-            throw new RuntimeException("Customer does not exist with user id: " + bottleTransactionRequestDto.getCustomerId());
+            throw new RuntimeException("Customer does not exist with user id: " + customerId);
         }
+        CustomerPointEntity customerPoint = getCustomerPointEntity(bottleTransactionRequestDto, customer);
+        customer.get().setCustomerPoint(customerPoint);
+        customerRepository.save(customer.get());
+    }
+
+    private static CustomerPointEntity getCustomerPointEntity(BottleTransactionRequestDto bottleTransactionRequestDto, Optional<CustomerEntity> customer) {
         CustomerPointEntity customerPoint = customer.get().getCustomerPoint();
         customerPoint.setTotalPoints(customerPoint.getTotalPoints() + bottleTransactionRequestDto.getPoints());
         customerPoint.setTotalNumberOfSmallBottles(customerPoint.getTotalNumberOfSmallBottles() + bottleTransactionRequestDto.getNumberOfSmallBottles());
         customerPoint.setTotalNumberOfMediumBottles(customerPoint.getTotalNumberOfMediumBottles() + bottleTransactionRequestDto.getNumberOfMediumBottles());
         customerPoint.setTotalNumberOfLargeBottles(customerPoint.getTotalNumberOfLargeBottles() + bottleTransactionRequestDto.getNumberOfLargeBottles());
-        customer.get().setCustomerPoint(customerPoint);
-        customerRepository.save(customer.get());
+        return customerPoint;
     }
 
 
@@ -84,18 +90,5 @@ public class CustomerService {
         return customerMapper.map2ResponseDto(
                 customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found with id: " + id))
         );
-    }
-
-    public CustomerResponseDto getCurrentCustomer(Authentication authentication) {
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        String userId = jwt.getClaimAsString("userId");
-        UUID userUuid = UUID.fromString(userId);
-        Optional<CustomerEntity> customer = customerRepository
-                .findCustomerEntityByUserId(userUuid);
-        if (!customer.isPresent()) {
-            throw new RuntimeException("Customer does not exist with user id: " + userUuid);
-        }
-        return customerMapper.map2ResponseDto(customer.get());
-
     }
 }

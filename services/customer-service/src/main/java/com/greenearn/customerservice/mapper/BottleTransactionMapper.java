@@ -3,14 +3,20 @@ package com.greenearn.customerservice.mapper;
 import com.greenearn.customerservice.dto.BottleTransactionRequestDto;
 import com.greenearn.customerservice.dto.BottleTransactionResponseDto;
 import com.greenearn.customerservice.entity.BottleTransactionEntity;
+import com.greenearn.customerservice.service.CurrentCustomerService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class BottleTransactionMapper {
 
-    public BottleTransactionEntity mapTransactionRequestDtoToEntity(BottleTransactionRequestDto bottleTransactionRequestDto) {
+    private final CurrentCustomerService currentCustomerService;
+
+    public BottleTransactionEntity mapTransactionRequestDtoToEntity(BottleTransactionRequestDto bottleTransactionRequestDto, Authentication authentication) {
         return BottleTransactionEntity.builder()
-                .customerId(bottleTransactionRequestDto.getCustomerId())
+                .customerId(currentCustomerService.getCurrentCustomerId(authentication))
                 .containerId(bottleTransactionRequestDto.getContainerId())
                 .numberOfSmallBottles(bottleTransactionRequestDto.getNumberOfSmallBottles())
                 .numberOfMediumBottles(bottleTransactionRequestDto.getNumberOfMediumBottles())

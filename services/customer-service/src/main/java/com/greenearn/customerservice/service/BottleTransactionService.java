@@ -10,6 +10,7 @@ import com.greenearn.customerservice.repository.BottleTransactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,12 +28,12 @@ public class BottleTransactionService {
     private final BottleTransactionMapper bottleTransactionMapper;
 
 
-    public void createBottleTransaction(BottleTransactionRequestDto bottleTransactionRequestDto) {
-        BottleTransactionEntity bottleTransactionEntity = bottleTransactionMapper.mapTransactionRequestDtoToEntity(bottleTransactionRequestDto);
+    public void createBottleTransaction(BottleTransactionRequestDto bottleTransactionRequestDto, Authentication authentication) {
+        BottleTransactionEntity bottleTransactionEntity = bottleTransactionMapper.mapTransactionRequestDtoToEntity(bottleTransactionRequestDto, authentication);
         try {
             bottleTransactionEntity.setBottleTransactionStatus(BottleTransactionStatus.SUCCESS);
             bottleTransactionRepository.save(bottleTransactionEntity);
-            customerService.updateCustomerPointsOnBottleTransaction(bottleTransactionRequestDto);
+            customerService.updateCustomerPointsOnBottleTransaction(bottleTransactionRequestDto, authentication);
         } catch (Exception e) {
             log.error(e.getMessage());
             bottleTransactionEntity.setBottleTransactionStatus(BottleTransactionStatus.FAILED);
