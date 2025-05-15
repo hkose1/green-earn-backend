@@ -29,6 +29,10 @@ public class FilterChainConfiguration {
             "/actuator/health",
             "/actuator/**",
             "/api/auth/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/api-docs/**"
     };
 
     @Bean
