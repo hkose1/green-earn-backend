@@ -4,6 +4,7 @@ package com.greenearn.customerservice.controller;
 import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
 import com.greenearn.customerservice.dto.CustomerResponseDto;
 import com.greenearn.customerservice.service.CustomerService;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,7 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getCustomerById(id));
     }
 
+    @Hidden
     @PostMapping
     public ResponseEntity<Void> createCustomer(@RequestBody @Validated CreateCustomerRequestDto createCustomerRequestDto) {
         customerService.createCustomer(createCustomerRequestDto);

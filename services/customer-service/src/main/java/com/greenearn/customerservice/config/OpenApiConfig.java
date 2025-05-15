@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,12 +16,15 @@ import java.util.List;
 @Configuration
 public class OpenApiConfig {
 
+    @Value("${openapi.server.url}")
+    private String serverUrl;
+
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Auth Service API")
-                        .description("Green Earn Auth Service API Documentation")
+                        .title("Customer Service API")
+                        .description("Green Earn Customer Service API Documentation")
                         .version("1.0")
                         .contact(new Contact()
                                 .name("Green Earn Team")
@@ -30,7 +34,7 @@ public class OpenApiConfig {
                                 .url("http://www.apache.org/licenses/LICENSE-2.0.html")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:8083")
+                                .url(serverUrl)
                                 .description("Local Development Server")
                 ))
                 .components(new io.swagger.v3.oas.models.Components()
