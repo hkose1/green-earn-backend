@@ -2,6 +2,7 @@ package com.greenearn.customerservice.service;
 
 
 import com.greenearn.customerservice.dto.BottleTransactionRequestDto;
+import com.greenearn.customerservice.dto.BottleTransactionResponseDto;
 import com.greenearn.customerservice.entity.BottleTransactionEntity;
 import com.greenearn.customerservice.enums.BottleTransactionStatus;
 import com.greenearn.customerservice.mapper.BottleTransactionMapper;
@@ -10,6 +11,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
@@ -33,6 +38,25 @@ public class BottleTransactionService {
             bottleTransactionEntity.setBottleTransactionStatus(BottleTransactionStatus.FAILED);
             bottleTransactionRepository.save(bottleTransactionEntity);
         }
-
     }
+
+    public List<BottleTransactionResponseDto> getAllBottleTransactions() {
+        try {
+            return bottleTransactionRepository.findAll()
+                    .stream()
+                    .map(customerEntity -> bottleTransactionMapper.map2ResponseDto(customerEntity))
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error while fetching all bottle transactions", e);
+            return new ArrayList<>();
+        }
+    }
+
+    public BottleTransactionResponseDto getBottleTransactionById(UUID id) {
+        return bottleTransactionMapper.map2ResponseDto(
+                bottleTransactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Bottle transaction not found with id: " + id))
+        );
+    }
+
+
 }

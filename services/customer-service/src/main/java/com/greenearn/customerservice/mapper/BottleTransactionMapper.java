@@ -21,6 +21,8 @@ public class BottleTransactionMapper {
 
     public BottleTransactionResponseDto map2ResponseDto(BottleTransactionEntity bottleTransactionEntity) {
         return BottleTransactionResponseDto.builder()
+                .id(bottleTransactionEntity.getId())
+                .bottleTransactionStatus(bottleTransactionEntity.getBottleTransactionStatus())
                 .customerId(bottleTransactionEntity.getCustomerId())
                 .containerId(bottleTransactionEntity.getContainerId())
                 .numberOfSmallBottles(bottleTransactionEntity.getNumberOfSmallBottles())
