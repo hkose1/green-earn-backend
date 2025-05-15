@@ -8,15 +8,14 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
@@ -40,6 +39,30 @@ public class JwtTokenProvider {
         return extractExpiration(token).before(new Date(System.currentTimeMillis()));
     }
 
+    public UUID extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        Object userIdClaim = claims.get("userId");
+
+        if (userIdClaim instanceof String) {
+            return UUID.fromString((String) userIdClaim);
+        }
+
+        throw new IllegalArgumentException("Invalid or missing userId in token");
+    }
+
+    public List<String> extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        Object roles = claims.get("roles");
+
+        if (roles instanceof List<?>) {
+            return ((List<?>) roles).stream()
+                    .map(Object::toString)
+                    .collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -50,7 +73,6 @@ public class JwtTokenProvider {
 
     public String generateToken(Map<String, Object> extraClaims,
                                 UserDetails userDetails) {
-
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
@@ -63,8 +85,28 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String generateSystemToken() {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", "00000000-0000-0000-0000-000000000000");
+        extraClaims.put("roles", List.of("ROLE_SYSTEM"));
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setSubject("system@greenearn.com")
+                .setIssuer("auth-service")
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 600000))
+                .setNotBefore(new Date(System.currentTimeMillis()))
+                .setId(UUID.randomUUID().toString())
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", ((UserDetailsImpl)userDetails).getId());
+        extraClaims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
         return this.generateToken(extraClaims, userDetails);
     }
 

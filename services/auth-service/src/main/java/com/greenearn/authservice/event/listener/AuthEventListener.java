@@ -3,6 +3,7 @@ package com.greenearn.authservice.event.listener;
 import com.greenearn.authservice.client.CustomerServiceClient;
 import com.greenearn.authservice.client.request.CreateCustomerRequestDto;
 import com.greenearn.authservice.mapper.UserMapper;
+import com.greenearn.authservice.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ public class AuthEventListener {
     private final MailServiceClient mailServiceClient;
     private final CustomerServiceClient customerServiceClient;
     private final UserMapper userMapper;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @EventListener
     public void onUserEvent(UserEvent event) {
@@ -40,7 +42,8 @@ public class AuthEventListener {
             case CREATE_CUSTOMER -> {
                 CreateCustomerRequestDto customerRequestDto = userMapper
                         .mapEntityToCreateCustomerRequestDto(event.getUser());
-                customerServiceClient.createCustomer(customerRequestDto);
+                final String token = jwtTokenProvider.generateSystemToken();
+                customerServiceClient.createCustomer(customerRequestDto, "Bearer " + token);
             }
             default -> {}
         }

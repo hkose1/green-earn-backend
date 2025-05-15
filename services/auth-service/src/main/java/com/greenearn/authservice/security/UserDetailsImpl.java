@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor
@@ -29,6 +30,8 @@ public class UserDetailsImpl implements UserDetails {
     public String getUsername() {
         return user.getEmail();
     }
+
+    public UUID getId() { return user.getId(); }
 
     @Override
     public boolean isAccountNonExpired() {
