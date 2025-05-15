@@ -3,6 +3,7 @@ package com.greenearn.customerservice.service;
 
 import com.greenearn.customerservice.dto.BottleTransactionRequestDto;
 import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
+import com.greenearn.customerservice.dto.CustomerResponseDto;
 import com.greenearn.customerservice.entity.CustomerEntity;
 import com.greenearn.customerservice.entity.CustomerPointEntity;
 import com.greenearn.customerservice.mapper.CustomerMapper;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,5 +64,23 @@ public class CustomerService {
         customerPointEntity.setTotalNumberOfLargeBottles(0);
         customerPointEntity.setTotalPoints(0);
         return customerPointEntity;
+    }
+
+    public List<CustomerResponseDto> getAllCustomers() {
+        try {
+            return customerRepository.findAll()
+                    .stream()
+                    .map(customerEntity -> customerMapper.map2ResponseDto(customerEntity))
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error while fetching all customers", e);
+            return new ArrayList<>();
+        }
+    }
+
+    public CustomerResponseDto getCustomerById(UUID id) {
+        return customerMapper.map2ResponseDto(
+                customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found with id: " + id))
+        );
     }
 }

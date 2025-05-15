@@ -24,5 +24,5 @@ public class CustomerResponseDto {
     private String email;
     private String phoneNumber;
     private String profileImageUrl;
-    private CustomerPointEntity customerPoint;
+    private CustomerPointDto customerPointDto;
 }
