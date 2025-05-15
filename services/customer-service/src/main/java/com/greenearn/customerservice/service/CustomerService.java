@@ -11,6 +11,8 @@ import com.greenearn.customerservice.repository.CustomerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -82,5 +84,18 @@ public class CustomerService {
         return customerMapper.map2ResponseDto(
                 customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found with id: " + id))
         );
+    }
+
+    public CustomerResponseDto getCurrentCustomer(Authentication authentication) {
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        UUID userUuid = UUID.fromString(userId);
+        Optional<CustomerEntity> customer = customerRepository
+                .findCustomerEntityByUserId(userUuid);
+        if (!customer.isPresent()) {
+            throw new RuntimeException("Customer does not exist with user id: " + userUuid);
+        }
+        return customerMapper.map2ResponseDto(customer.get());
+
     }
 }
