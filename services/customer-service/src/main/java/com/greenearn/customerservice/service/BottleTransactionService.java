@@ -45,7 +45,7 @@ public class BottleTransactionService {
         try {
             return bottleTransactionRepository.findAll()
                     .stream()
-                    .map(customerEntity -> bottleTransactionMapper.map2ResponseDto(customerEntity))
+                    .map(bottleTransactionEntity -> bottleTransactionMapper.map2ResponseDto(bottleTransactionEntity))
                     .toList();
         } catch (Exception e) {
             log.error("Error while fetching all bottle transactions", e);
@@ -57,6 +57,18 @@ public class BottleTransactionService {
         return bottleTransactionMapper.map2ResponseDto(
                 bottleTransactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Bottle transaction not found with id: " + id))
         );
+    }
+
+    public List<BottleTransactionResponseDto> getAllBottleTransactionsByCustomerId(UUID customerId) {
+        try {
+            return bottleTransactionRepository.findBottleTransactionEntitiesByCustomerId(customerId)
+                    .stream()
+                    .map(bottleTransactionEntity -> bottleTransactionMapper.map2ResponseDto(bottleTransactionEntity))
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error while fetching all bottle transactions by customer id", e);
+            return new ArrayList<>();
+        }
     }
 
 
