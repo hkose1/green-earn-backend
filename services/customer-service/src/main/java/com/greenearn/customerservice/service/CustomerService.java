@@ -1,9 +1,7 @@
 package com.greenearn.customerservice.service;
 
 
-import com.greenearn.customerservice.dto.BottleTransactionRequestDto;
-import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
-import com.greenearn.customerservice.dto.CustomerResponseDto;
+import com.greenearn.customerservice.dto.*;
 import com.greenearn.customerservice.entity.CustomerEntity;
 import com.greenearn.customerservice.entity.CustomerPointEntity;
 import com.greenearn.customerservice.mapper.CustomerMapper;
@@ -11,13 +9,11 @@ import com.greenearn.customerservice.repository.CustomerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
@@ -90,5 +86,34 @@ public class CustomerService {
         return customerMapper.map2ResponseDto(
                 customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found with id: " + id))
         );
+    }
+
+    public CustomerResponseDto updateCurrentCustomer(Authentication authentication, UpdateCustomerRequestDto updateCustomerRequestDto) {
+        final UUID customerId = currentCustomerService.getCurrentCustomerId(authentication);
+        CustomerEntity customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + customerId));
+        
+        if (updateCustomerRequestDto.getPhoneNumber() != null) {
+            customer.setPhoneNumber(updateCustomerRequestDto.getPhoneNumber());
+        }
+        if (updateCustomerRequestDto.getProfileImageUrl() != null) {
+            customer.setProfileImageUrl(updateCustomerRequestDto.getProfileImageUrl());
+        }
+        
+        return customerMapper.map2ResponseDto(customerRepository.save(customer));
+    }
+
+    public void internalUpdateCurrentCustomer(Authentication authentication, InternalUpdateCustomerRequestDto internalUpdateCustomerRequestDto) {
+        if (internalUpdateCustomerRequestDto.getUserId() == null ||
+                internalUpdateCustomerRequestDto.getUserId().toString().isBlank())
+        {
+            return;
+        }
+        CustomerEntity customer = customerRepository.findCustomerEntityByUserId(internalUpdateCustomerRequestDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + internalUpdateCustomerRequestDto.getUserId()));
+
+        customer.setFirstName(internalUpdateCustomerRequestDto.getFirstName());
+        customer.setLastName(internalUpdateCustomerRequestDto.getLastName());
+        customerRepository.save(customer);
     }
 }

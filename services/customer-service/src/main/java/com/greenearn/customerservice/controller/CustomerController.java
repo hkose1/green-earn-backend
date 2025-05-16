@@ -3,16 +3,18 @@ package com.greenearn.customerservice.controller;
 
 import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
 import com.greenearn.customerservice.dto.CustomerResponseDto;
+import com.greenearn.customerservice.dto.InternalUpdateCustomerRequestDto;
+import com.greenearn.customerservice.dto.UpdateCustomerRequestDto;
 import com.greenearn.customerservice.service.CurrentCustomerService;
 import com.greenearn.customerservice.service.CustomerService;
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,9 +48,27 @@ public class CustomerController {
 
     @Hidden
     @PreAuthorize("hasRole('SYSTEM')")
-    @PostMapping
-    public ResponseEntity<Void> createCustomer(@RequestBody @Validated CreateCustomerRequestDto createCustomerRequestDto) {
+    @PostMapping("/internal")
+    public ResponseEntity<Void> createCustomer(@RequestBody @Valid CreateCustomerRequestDto createCustomerRequestDto) {
         customerService.createCustomer(createCustomerRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<CustomerResponseDto> updateCurrentCustomer(
+            Authentication authentication,
+            @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
+        return ResponseEntity.ok(customerService.updateCurrentCustomer(authentication, updateCustomerRequestDto));
+    }
+
+    @Hidden
+    @PreAuthorize("hasRole('SYSTEM')")
+    @PutMapping("/internal")
+    public ResponseEntity<Void> internalUpdateCurrentCustomer(
+            Authentication authentication,
+            @RequestBody @Valid InternalUpdateCustomerRequestDto internalUpdateCustomerRequestDto
+    ) {
+        customerService.internalUpdateCurrentCustomer(authentication, internalUpdateCustomerRequestDto);
+        return ResponseEntity.ok().build();
     }
 }
