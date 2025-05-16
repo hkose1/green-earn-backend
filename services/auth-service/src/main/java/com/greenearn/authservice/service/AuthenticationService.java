@@ -1,13 +1,12 @@
 package com.greenearn.authservice.service;
 
-import com.greenearn.authservice.dto.AuthRequest;
-import com.greenearn.authservice.dto.AuthResponse;
-import com.greenearn.authservice.dto.PasswordResetRequest;
-import com.greenearn.authservice.dto.SignupRequest;
+import com.greenearn.authservice.dto.*;
 
 public interface AuthenticationService {
 
     void registerUser(SignupRequest signupRequest);
+
+    void updateUser(UpdateUserDto updateUserDto);
 
     AuthResponse login(AuthRequest authRequest);
 

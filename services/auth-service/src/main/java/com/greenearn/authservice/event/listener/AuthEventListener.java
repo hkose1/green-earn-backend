@@ -2,6 +2,7 @@ package com.greenearn.authservice.event.listener;
 
 import com.greenearn.authservice.client.CustomerServiceClient;
 import com.greenearn.authservice.client.request.CreateCustomerRequestDto;
+import com.greenearn.authservice.client.request.UpdateCustomerRequestDto;
 import com.greenearn.authservice.mapper.UserMapper;
 import com.greenearn.authservice.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,15 @@ public class AuthEventListener {
                         .mapEntityToCreateCustomerRequestDto(event.getUser());
                 final String token = jwtTokenProvider.generateSystemToken();
                 customerServiceClient.createCustomer(customerRequestDto, "Bearer " + token);
+            }
+            case UPDATE_CUSTOMER -> {
+                UpdateCustomerRequestDto updateCustomerRequestDto = UpdateCustomerRequestDto.builder()
+                        .userId(event.getUser().getId())
+                        .firstName(event.getUser().getFirstname())
+                        .lastName(event.getUser().getLastname())
+                        .build();
+                final String token = jwtTokenProvider.generateSystemToken();
+                customerServiceClient.updateCustomer(updateCustomerRequestDto, "Bearer " + token);
             }
             default -> {}
         }

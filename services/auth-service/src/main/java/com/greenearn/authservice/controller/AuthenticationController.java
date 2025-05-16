@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +26,16 @@ public class AuthenticationController {
 
     @GetMapping("/current-user")
     public ResponseEntity<ApiResponse<UserDto>> getCurrentUser(HttpServletRequest request) {
-        return ResponseEntity.ok().body(RequestUtils.getApiResponse(request, currentUserService.getCurrentUser(), "", HttpStatus.OK));
+        return ResponseEntity.ok().body(RequestUtils.getApiResponse(request, currentUserService.getCurrentUserDto(), "", HttpStatus.OK));
+    }
+
+    @PatchMapping("/current-user")
+    public ResponseEntity<ApiResponse<Void>> updateUser(@Valid @RequestBody UpdateUserDto updateUserDto,
+                                                        HttpServletRequest request) {
+        authenticationService.updateUser(updateUserDto);
+        return ResponseEntity
+                .ok()
+                .body(RequestUtils.getApiResponse(request, null, "User updated", HttpStatus.OK));
     }
 
     @PostMapping("/register")

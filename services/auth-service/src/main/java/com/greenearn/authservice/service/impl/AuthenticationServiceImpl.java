@@ -2,7 +2,9 @@ package com.greenearn.authservice.service.impl;
 
 import com.greenearn.authservice.client.CustomerServiceClient;
 import com.greenearn.authservice.client.request.CreateCustomerRequestDto;
+import com.greenearn.authservice.dto.*;
 import com.greenearn.authservice.mapper.UserMapper;
+import com.greenearn.authservice.service.CurrentUserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.greenearn.authservice.dto.AuthRequest;
-import com.greenearn.authservice.dto.AuthResponse;
-import com.greenearn.authservice.dto.PasswordResetRequest;
-import com.greenearn.authservice.dto.SignupRequest;
 import com.greenearn.authservice.entity.CodeConfirmationEntity;
 import com.greenearn.authservice.entity.ConfirmationEntity;
 import com.greenearn.authservice.entity.RoleEntity;
@@ -55,6 +53,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtService;
     private final ApplicationEventPublisher eventPublisher;
+    private final CurrentUserService currentUserService;
 
 
     @Override
@@ -88,6 +87,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         Map.of("code", codeConfirmationEntity.getCode(), "key", confirmationEntity.getKey())
                 )
         );
+    }
+
+    @Override
+    @Transactional
+    public void updateUser(UpdateUserDto updateUserDto) {
+        UserEntity currentUser = currentUserService.getCurrentUserEntity();
+        currentUser.setFirstname(updateUserDto.getFirstName());
+        currentUser.setLastname(updateUserDto.getLastName());
+        eventPublisher.publishEvent(
+                new UserEvent(
+                        currentUser,
+                        EventType.UPDATE_CUSTOMER,
+                        Map.of()
+                )
+        );
+        userRepository.save(currentUser);
     }
 
     @Override

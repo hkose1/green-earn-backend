@@ -16,7 +16,9 @@ public class SignupRequest {
     @Size(min = 3, max = 20, message = "Username should be between 3 and 20 characters")
     private String username;
 
+    @NotBlank(message = "First name cannot be empty or null")
     private String firstName;
+    @NotBlank(message = "Last name cannot be empty or null")
     private String lastName;
 
     @NotBlank(message = "Email cannot be empty or null")

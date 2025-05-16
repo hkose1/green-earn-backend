@@ -1,6 +1,7 @@
 package com.greenearn.authservice.service;
 
 import com.greenearn.authservice.dto.UserDto;
+import com.greenearn.authservice.entity.UserEntity;
 import com.greenearn.authservice.mapper.UserMapper;
 import com.greenearn.authservice.repository.UserRepository;
 import com.greenearn.authservice.security.JwtTokenProvider;
@@ -29,10 +30,16 @@ public class CurrentUserService {
         return jwtTokenProvider.extractUserId(token);
     }
 
-    public UserDto getCurrentUser() {
+    public UserDto getCurrentUserDto() {
         final UUID userId = getCurrentUserId();
         return userRepository.findById(userId)
                 .map(userMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+    }
+
+    public UserEntity getCurrentUserEntity() {
+        final UUID userId = getCurrentUserId();
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
     }
 }
