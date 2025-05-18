@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -17,5 +19,5 @@ public class CreateRewardRequestDto {
     private Integer costPoints;
     private Boolean isActive;
     private RewardCategory rewardCategory;
-    private CreateRewardProviderRequestDto createRewardProviderRequestDto;
+    private UUID rewardProviderId;
 }

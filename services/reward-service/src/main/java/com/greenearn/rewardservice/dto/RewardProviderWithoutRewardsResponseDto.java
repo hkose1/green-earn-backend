@@ -7,14 +7,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Builder
-public class RewardProviderResponseDto {
+public class RewardProviderWithoutRewardsResponseDto {
+
     private UUID id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -22,5 +22,4 @@ public class RewardProviderResponseDto {
     private String name;
     private String description;
     private String logoUrl;
-    private List<RewardWithoutProviderResponseDto> providedRewards;
 }

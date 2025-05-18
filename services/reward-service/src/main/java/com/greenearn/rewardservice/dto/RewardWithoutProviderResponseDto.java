@@ -1,26 +1,27 @@
 package com.greenearn.rewardservice.dto;
 
+
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.greenearn.rewardservice.enums.BrandType;
+import com.greenearn.rewardservice.enums.RewardCategory;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Builder
-public class RewardProviderResponseDto {
+public class RewardWithoutProviderResponseDto {
     private UUID id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private BrandType brandType;
-    private String name;
+    private String title;
     private String description;
-    private String logoUrl;
-    private List<RewardWithoutProviderResponseDto> providedRewards;
+    private String imageUrl;
+    private Integer costPoints;
+    private Boolean isActive;
+    private RewardCategory rewardCategory;
 }
