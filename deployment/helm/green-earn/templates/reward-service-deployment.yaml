@@ -1,0 +1,2 @@
+{{- $values := .Values.rewardService }}
+{{- template "microservice.deployment" (dict "name" $values.name "replicaCount" $values.replicaCount "image" $values.image "service" $values.service "resources" $values.resources "Values" $.Values) }}  
