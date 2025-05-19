@@ -45,6 +45,18 @@ jobs:
             & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
             cd ../..
           }
+
+          if (Test-Path "services/customer-service/pom.xml") {
+            cd services/customer-service
+            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
+            cd ../..
+          }
+
+          if (Test-Path "services/reward-service/pom.xml") {
+            cd services/reward-service
+            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
+            cd ../..
+          }
           
       - name: Login to Azure Container Registry
         uses: azure/docker-login@v1
