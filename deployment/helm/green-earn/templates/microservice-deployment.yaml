@@ -57,6 +57,11 @@ spec:
                 secretKeyRef:
                   name: azure-postgres-secret
                   key: host
+            - name: SPRING_DATASOURCE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: port
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -72,11 +77,6 @@ spec:
             - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
               value: "org.hibernate.dialect.PostgreSQLDialect"
             {{- if eq .name "auth-service" }}
-            - name: SPRING_DATASOURCE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: azure-postgres-secret
-                  key: port
             - name: SPRING_DATASOURCE_DATABASE
               valueFrom:
                 secretKeyRef:
@@ -84,11 +84,6 @@ spec:
                   key: database
             {{- end }}
             {{- if eq .name "customer-service" }}
-            - name: SPRING_DATASOURCE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: azure-postgres-secret
-                  key: port
             - name: SPRING_DATASOURCE_CUSTOMER_SERVICE_DATABASE
               valueFrom:
                 secretKeyRef:
@@ -96,11 +91,6 @@ spec:
                   key: customer-database
             {{- end }}
             {{- if eq .name "reward-service" }}
-            - name: SPRING_DATASOURCE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: azure-postgres-secret
-                  key: port
             - name: SPRING_DATASOURCE_REWARD_SERVICE_DATABASE
               valueFrom:
                 secretKeyRef:
