@@ -6,6 +6,8 @@ import com.greenearn.rewardservice.enums.RewardCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -19,6 +21,7 @@ public class RewardEntity extends Auditable {
     private String imageUrl;
     private Integer costPoints;
     private Boolean isActive;
+    private Integer stock;
 
     @Enumerated(EnumType.STRING)
     private RewardCategory rewardCategory;

@@ -16,6 +16,7 @@ import java.util.UUID;
 @Builder
 public class RewardResponseDto {
     private UUID id;
+    private Integer stock;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String title;

@@ -11,7 +11,7 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Builder
 public class CreateRewardRequestWithoutProviderDto {
-
+    private Integer stock;
     private String title;
     private String description;
     private String imageUrl;

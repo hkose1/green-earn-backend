@@ -19,7 +19,8 @@ public class RewardTransactionResponseDto {
     private UUID id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private UUID customerId;
+    private UUID userId;
+    private String failureMessage;
     private RewardCategory rewardCategory;
     private RewardTransactionStatus rewardTransactionStatus;
     private BrandType brandType;

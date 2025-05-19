@@ -16,16 +16,17 @@ public class RewardTransactionMapper {
                 .createdAt(rewardTransaction.getCreatedAt())
                 .updatedAt(rewardTransaction.getUpdatedAt())
                 .brandType(rewardTransaction.getBrandType())
-                .customerId(rewardTransaction.getCustomerId())
+                .userId(rewardTransaction.getUserId())
+                .failureMessage(rewardTransaction.getFailureMessage())
                 .totalCostPoint(rewardTransaction.getTotalCostPoint())
                 .quantity(rewardTransaction.getQuantity())
                 .build();
     }
 
-    public static RewardTransactionEntity matCreateRewardTransactionRequest2Entity(CreateRewardTransactionRequestDto createRewardTransactionRequestDto) {
+    public static RewardTransactionEntity mapCreateRewardTransactionRequest2Entity(CreateRewardTransactionRequestDto createRewardTransactionRequestDto) {
         return RewardTransactionEntity.builder()
                 .brandType(createRewardTransactionRequestDto.getBrandType())
-                .customerId(createRewardTransactionRequestDto.getCustomerId())
+                .userId(createRewardTransactionRequestDto.getUserId())
                 .totalCostPoint(createRewardTransactionRequestDto.getTotalCostPoint())
                 .quantity(createRewardTransactionRequestDto.getQuantity())
                 .rewardCategory(createRewardTransactionRequestDto.getRewardCategory())

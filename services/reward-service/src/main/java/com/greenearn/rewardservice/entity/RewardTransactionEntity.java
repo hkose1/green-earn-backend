@@ -20,7 +20,7 @@ import java.util.UUID;
 @Entity(name = "reward_transactions")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class RewardTransactionEntity extends Auditable {
-    private UUID customerId;
+    private UUID userId;
     @Enumerated(EnumType.STRING)
     private RewardCategory rewardCategory;
     @Enumerated(EnumType.STRING)
@@ -29,5 +29,6 @@ public class RewardTransactionEntity extends Auditable {
     private BrandType brandType;
     private Integer quantity;
     private Integer totalCostPoint;
+    private String failureMessage;
 
 }

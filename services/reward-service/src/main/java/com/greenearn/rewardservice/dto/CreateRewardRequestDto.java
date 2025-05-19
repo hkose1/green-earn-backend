@@ -20,4 +20,5 @@ public class CreateRewardRequestDto {
     private Boolean isActive;
     private RewardCategory rewardCategory;
     private UUID rewardProviderId;
+    private Integer stock;
 }

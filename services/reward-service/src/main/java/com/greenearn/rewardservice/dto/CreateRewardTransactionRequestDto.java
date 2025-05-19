@@ -15,7 +15,7 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Builder
 public class CreateRewardTransactionRequestDto {
-    private UUID customerId;
+    private UUID userId;
     private RewardCategory rewardCategory;
     private RewardTransactionStatus rewardTransactionStatus;
     private BrandType brandType;

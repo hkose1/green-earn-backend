@@ -16,6 +16,7 @@ import java.util.UUID;
 @Builder
 public class RewardWithoutProviderResponseDto {
     private UUID id;
+    private Integer stock;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String title;
