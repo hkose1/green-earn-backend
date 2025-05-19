@@ -83,7 +83,7 @@ jobs:
               if ($content -and $content.Trim() -ne "") {
                 cd "$service"
                 Write-Host "Building and pushing $service..."
-                $imageName = "${{ secrets.ACR_LOGIN_SERVER }}/$($coreServices[$service]):latest"
+                $imageName = "${{ secrets.ACR_LOGIN_SERVER }}/$($coreServices[$service]):${{ github.sha }}"
                 Write-Host "Image name: $imageName"
                 docker build --no-cache -t $imageName .
                 docker push $imageName
@@ -96,8 +96,8 @@ jobs:
           if (Test-Path "services/auth-service/Dockerfile") {
             Write-Host "Building and pushing auth-service..."
             cd services/auth-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service:latest" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service:latest"
+            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service:${{ github.sha }}" .
+            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service:${{ github.sha }}"
             cd ../..
           }
           
@@ -105,8 +105,8 @@ jobs:
           if (Test-Path "services/mail-service/Dockerfile") {
             Write-Host "Building and pushing mail-service..."
             cd services/mail-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service:latest" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service:latest"
+            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service:${{ github.sha }}" .
+            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service:${{ github.sha }}"
             cd ../..
           }
 
@@ -114,8 +114,8 @@ jobs:
           if (Test-Path "services/customer-service/Dockerfile") {
             Write-Host "Building and pushing customer-service..."
             cd services/customer-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service:latest" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service:latest"
+            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service:${{ github.sha }}" .
+            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service:${{ github.sha }}"
             cd ../..
           }
 
@@ -123,8 +123,8 @@ jobs:
           if (Test-Path "services/reward-service/Dockerfile") {
             Write-Host "Building and pushing reward-service..."
             cd services/reward-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service:latest" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service:latest"
+            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service:${{ github.sha }}" .
+            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service:${{ github.sha }}"
             cd ../..
           }
 
@@ -206,9 +206,16 @@ jobs:
             --set global.environment=production `
             --set global.acrLoginServer=${{ secrets.ACR_LOGIN_SERVER }} `
             --set apiGateway.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-api-gateway `
+            --set apiGateway.image.tag=${{ github.sha }} `
             --set eventBus.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-event-bus `
+            --set eventBus.image.tag=${{ github.sha }} `
             --set serviceRegistry.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-service-registry `
+            --set serviceRegistry.image.tag=${{ github.sha }} `
             --set authService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service `
+            --set authService.image.tag=${{ github.sha }} `
             --set mailService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service `
+            --set mailService.image.tag=${{ github.sha }} `
             --set customerService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service `
+            --set customerService.image.tag=${{ github.sha }} `
             --set rewardService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service `
+            --set rewardService.image.tag=${{ github.sha }} `
