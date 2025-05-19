@@ -54,6 +54,7 @@ services:
             config:
               secret_is_base64: true
               key_claim_name: iss
+      - name: bottle-transactions-route
         paths:
           - /api/bottle-transactions
         strip_path: false
@@ -76,6 +77,7 @@ services:
             config:
               secret_is_base64: true
               key_claim_name: iss
+      - name: reward-providers-route
         paths:
           - /api/reward-providers
         strip_path: false
@@ -85,6 +87,7 @@ services:
             config:
               secret_is_base64: true
               key_claim_name: iss
+      - name: reward-transactions-route
         paths:
           - /api/reward-transactions
         strip_path: false
