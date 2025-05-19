@@ -75,4 +75,4 @@ springdoc:
     tagsSorter: alpha
     tryItOutEnabled: true
     filter: true
-  packages-to-scan: com.greenearn.customerservice.controller
+  packages-to-scan: com.greenearn.rewardservice.controller
