@@ -41,6 +41,60 @@ services:
             config:
               secret_is_base64: true
               key_claim_name: iss
+  - name: customer-service
+    url: http://customer-service:8083
+    routes:
+      - name: customer-route
+        paths:
+          - /api/customers
+        strip_path: false
+        preserve_host: false
+        plugins:
+          - name: jwt
+            config:
+              secret_is_base64: true
+              key_claim_name: iss
+        paths:
+          - /api/bottle-transactions
+        strip_path: false
+        preserve_host: false
+        plugins:
+          - name: jwt
+            config:
+              secret_is_base64: true
+              key_claim_name: iss
+  - name: reward-service
+    url: http://reward-service:8084
+    routes:
+      - name: reward-route
+        paths:
+          - /api/rewards
+        strip_path: false
+        preserve_host: false
+        plugins:
+          - name: jwt
+            config:
+              secret_is_base64: true
+              key_claim_name: iss
+        paths:
+          - /api/reward-providers
+        strip_path: false
+        preserve_host: false
+        plugins:
+          - name: jwt
+            config:
+              secret_is_base64: true
+              key_claim_name: iss
+        paths:
+          - /api/reward-transactions
+        strip_path: false
+        preserve_host: false
+        plugins:
+          - name: jwt
+            config:
+              secret_is_base64: true
+              key_claim_name: iss
+
 
 # Global JWT plugin kaldırıldı çünkü auth endpoint'leri için JWT doğrulaması yapılmamalı
 

@@ -98,6 +98,24 @@ jobs:
             cd ../..
           }
 
+          # Build and push customer-service
+          if (Test-Path "services/customer-service/Dockerfile") {
+            Write-Host "Building and pushing customer-service..."
+            cd services/customer-service
+            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service:latest" .
+            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service:latest"
+            cd ../..
+          }
+
+          # Build and push reward-service
+          if (Test-Path "services/reward-service/Dockerfile") {
+            Write-Host "Building and pushing reward-service..."
+            cd services/reward-service
+            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service:latest" .
+            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service:latest"
+            cd ../..
+          }
+
   deploy:
     needs: build-and-test
     runs-on: self-hosted
@@ -159,6 +177,8 @@ jobs:
             --from-literal=host=${{ secrets.AZURE_POSTGRES_HOST }} `
             --from-literal=port=${{ secrets.AZURE_POSTGRES_PORT }} `
             --from-literal=database=${{ secrets.AZURE_POSTGRES_DATABASE }} `
+            --from-literal=customer-database=${{ secrets.AZURE_POSTGRES_CUSTOMER_SERVICE_DATABASE }} `
+            --from-literal=reward-database=${{ secrets.AZURE_POSTGRES_REWARD_SERVICE_DATABASE }} `
             --from-literal=username=${{ secrets.AZURE_POSTGRES_USERNAME }} `
             --from-literal=password=${{ secrets.AZURE_POSTGRES_PASSWORD }} `
             -n green-earn --dry-run=client -o yaml | kubectl apply -f -
@@ -178,4 +198,5 @@ jobs:
             --set serviceRegistry.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-service-registry `
             --set authService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service `
             --set mailService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service `
-            --set customerService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service 
+            --set customerService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service `
+            --set rewardService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service `

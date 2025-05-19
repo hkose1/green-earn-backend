@@ -52,22 +52,11 @@ spec:
               value: "user"
             - name: SPRING_RABBITMQ_PASSWORD
               value: "password"
-            {{- if eq .name "auth-service" }}
             - name: SPRING_DATASOURCE_HOST
               valueFrom:
                 secretKeyRef:
                   name: azure-postgres-secret
                   key: host
-            - name: SPRING_DATASOURCE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: azure-postgres-secret
-                  key: port
-            - name: SPRING_DATASOURCE_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: azure-postgres-secret
-                  key: database
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -82,6 +71,41 @@ spec:
               value: "update"
             - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
               value: "org.hibernate.dialect.PostgreSQLDialect"
+            {{- if eq .name "auth-service" }}
+            - name: SPRING_DATASOURCE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: port
+            - name: SPRING_DATASOURCE_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: database
+            {{- end }}
+            {{- if eq .name "customer-service" }}
+            - name: SPRING_DATASOURCE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: port
+            - name: SPRING_DATASOURCE_CUSTOMER_SERVICE_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: customer-database
+            {{- end }}
+            {{- if eq .name "reward-service" }}
+            - name: SPRING_DATASOURCE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: port
+            - name: SPRING_DATASOURCE_REWARD_SERVICE_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: reward-database
             {{- end }}
           livenessProbe:
             httpGet:
