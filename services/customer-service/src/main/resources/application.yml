@@ -2,7 +2,7 @@ spring:
   application:
     name: customer-service
   datasource:
-    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_DATABASE}?sslmode=require
+    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${AZURE_POSTGRES_CUSTOMER_SERVICE_DATABASE}?sslmode=require
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -55,6 +55,13 @@ management:
   endpoint:
     health:
       show-details: always
+
+gateway:
+  url: http://57.151.52.238:8000
+
+openapi:
+  server:
+    url: ${gateway.url}/${spring.application.name}
 
 springdoc:
   api-docs:
