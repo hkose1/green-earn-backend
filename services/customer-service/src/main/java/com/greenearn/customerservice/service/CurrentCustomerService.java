@@ -19,7 +19,7 @@ public class CurrentCustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
-    public CustomerResponseDto getCurrentCustomer(Authentication authentication) {
+    public CustomerResponseDto getCurrentCustomerAsResponseDto(Authentication authentication) {
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
         UUID userUuid = UUID.fromString(userId);
@@ -31,8 +31,20 @@ public class CurrentCustomerService {
         return customerMapper.map2ResponseDto(customer.get());
     }
 
+    public CustomerEntity getCurrentCustomer(Authentication authentication) {
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        UUID userUuid = UUID.fromString(userId);
+        Optional<CustomerEntity> customer = customerRepository
+                .findCustomerEntityByUserId(userUuid);
+        if (!customer.isPresent()) {
+            throw new RuntimeException("Customer does not exist with user id: " + userUuid);
+        }
+        return customer.get();
+    }
+
     public UUID getCurrentCustomerId(Authentication authentication) {
-        CustomerResponseDto customerResponseDto = getCurrentCustomer(authentication);
+        CustomerResponseDto customerResponseDto = getCurrentCustomerAsResponseDto(authentication);
         if (customerResponseDto == null) {
             return null;
         }

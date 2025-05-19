@@ -1,6 +1,7 @@
 package com.greenearn.customerservice.controller;
 
 
+import com.greenearn.customerservice.client.response.UpdateCustomerPointsResponseDto;
 import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
 import com.greenearn.customerservice.dto.CustomerResponseDto;
 import com.greenearn.customerservice.dto.InternalUpdateCustomerRequestDto;
@@ -31,7 +32,7 @@ public class CustomerController {
 
     @GetMapping("/me")
     public ResponseEntity<CustomerResponseDto> getCurrentCustomer(Authentication authentication) {
-        return ResponseEntity.ok(currentCustomerService.getCurrentCustomer(authentication));
+        return ResponseEntity.ok(currentCustomerService.getCurrentCustomerAsResponseDto(authentication));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -59,6 +60,20 @@ public class CustomerController {
             Authentication authentication,
             @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
         return ResponseEntity.ok(customerService.updateCurrentCustomer(authentication, updateCustomerRequestDto));
+    }
+
+    @Hidden
+    @GetMapping("/internal/me/points")
+    public ResponseEntity<Integer> getMyPoints(Authentication authentication) {
+        return ResponseEntity.ok(customerService.getMyPoints(authentication));
+    }
+
+    @Hidden
+    @PostMapping("/internal/me/points/update")
+    public ResponseEntity<Void> updateMyPoints(@RequestBody UpdateCustomerPointsResponseDto updateDto,
+                                               Authentication authentication) {
+        customerService.updateMyPoints(authentication, updateDto);
+        return ResponseEntity.ok().build();
     }
 
     @Hidden

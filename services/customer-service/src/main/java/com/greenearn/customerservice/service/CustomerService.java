@@ -1,6 +1,7 @@
 package com.greenearn.customerservice.service;
 
 
+import com.greenearn.customerservice.client.response.UpdateCustomerPointsResponseDto;
 import com.greenearn.customerservice.dto.*;
 import com.greenearn.customerservice.entity.CustomerEntity;
 import com.greenearn.customerservice.entity.CustomerPointEntity;
@@ -9,11 +10,13 @@ import com.greenearn.customerservice.repository.CustomerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
@@ -114,6 +117,19 @@ public class CustomerService {
 
         customer.setFirstName(internalUpdateCustomerRequestDto.getFirstName());
         customer.setLastName(internalUpdateCustomerRequestDto.getLastName());
+        customerRepository.save(customer);
+    }
+
+    public Integer getMyPoints(Authentication authentication) {
+        CustomerEntity customer = currentCustomerService.getCurrentCustomer(authentication);
+        return customer.getCustomerPoint().getTotalPoints();
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public void updateMyPoints(Authentication authentication, UpdateCustomerPointsResponseDto updateDto) {
+        CustomerEntity customer = currentCustomerService.getCurrentCustomer(authentication);
+        final Integer customerTotalPoints = customer.getCustomerPoint().getTotalPoints();
+        customer.getCustomerPoint().setTotalPoints(customerTotalPoints - updateDto.getTotalCostPoints());
         customerRepository.save(customer);
     }
 }
