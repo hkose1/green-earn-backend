@@ -150,11 +150,11 @@ rewardService:
     port: 8084
   resources:
     limits:
+      cpu: 1000m
+      memory: 1024Mi
+    requests:
       cpu: 500m
       memory: 512Mi
-    requests:
-      cpu: 200m
-      memory: 256Mi
   env:
     SPRING_DATASOURCE_HOST: ${{ secrets.AZURE_POSTGRES_HOST }}
     SPRING_DATASOURCE_PORT: "5432"

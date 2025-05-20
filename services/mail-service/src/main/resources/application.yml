@@ -74,6 +74,6 @@ EMAIL_HOST: smtp.gmail.com
 EMAIL_PORT: 587
 EMAIL_ID: haydarkose86@gmail.com
 EMAIL_PASSWORD: dsak ckgs tndd okee
-VERIFY_EMAIL_HOST: http://57.151.52.238:${API_GATEWAY_PORT}
+VERIFY_EMAIL_HOST: http://57.151.33.67:${API_GATEWAY_PORT}
 server:
   port: ${SERVER_PORT}
