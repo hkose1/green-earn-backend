@@ -137,7 +137,7 @@ customerService:
     httpGet:
       path: /actuator/health
       port: 8083
-    initialDelaySeconds: 30
+    initialDelaySeconds: 90
     periodSeconds: 10
 
 rewardService:
@@ -173,7 +173,7 @@ rewardService:
     httpGet:
       path: /actuator/health
       port: 8084
-    initialDelaySeconds: 30
+    initialDelaySeconds: 90
     periodSeconds: 10
 
 elasticsearch:
