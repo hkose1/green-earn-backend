@@ -52,11 +52,11 @@ data:
               - /api/customers
             strip_path: false
             preserve_host: false
-            # plugins:
-            #   - name: jwt
-            #     config:
-            #       secret_is_base64: true
-            #       key_claim_name: iss
+            plugins:
+              - name: jwt
+                config:
+                  secret_is_base64: true
+                  key_claim_name: iss
           - name: bottle-transactions-route
             paths:
               - /api/bottle-transactions
