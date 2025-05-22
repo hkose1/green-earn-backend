@@ -68,7 +68,7 @@ jwt:
   secret: "M1Y1K1ZWajZtbnh0dmVqdmtEWFg5ZEQ1V2I0dHJSSFRzM3dDcGgyNzZCbjAwSkhvT0RqTjhDMzJGUEVxcHZCRnBjTFdBNjdHS2JNejdkQTE4RWNuVGZ4YUxYRmlsZWhaZnF4Y2dQUG11elM0VlVYcGVwTzdIUDVWMGdNY0NGWjVVQjV6Q29NTmFsZklxcVF5QXhRQll1R3ZybDdQd2c1WmpGbXo0aU80R0x5dUliU2ROY2V4eTlUc084UFQwOUZ4N3RNSHN3cDhPa2Qxcnl2dHJvdVo2NGlPeXFFTnF2bU9UTCtPcDdhcHdZcVZDczk1WldWZzRHcTNkbWdDUVJCUUhtVGxVSHIvN0huWi9NQnJNazZhNXIvYjh3KzNUTlQzTUYvYjNtOGhsZW1Gd1FTVXZPM2hOaG5zb296MUp1SFlrd2FRS1VROCtRM1ZVa3JSdUtQc1ZzN3dNY0VxV05wb0RvU3krcGNaY2Fj"
 
 gateway:
-  url: http://http://57.151.33.67:8000
+  url: http://57.151.33.67:8000
 
 openapi:
   server:
@@ -77,10 +77,13 @@ openapi:
 springdoc:
   api-docs:
     path: /api-docs
+    enabled: true
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
     tagsSorter: alpha
     tryItOutEnabled: true
     filter: true
+    config-url: /api-docs/swagger-config
+    url: /api-docs
   packages-to-scan: com.greenearn.rewardservice.controller

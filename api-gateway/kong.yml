@@ -28,6 +28,17 @@ services:
             config:
               secret_is_base64: true
               key_claim_name: iss
+      - name: auth-swagger-ui
+        paths:
+          - /auth-service/swagger-ui
+          - /auth-service/swagger-ui.html
+        strip_path: false
+        preserve_host: false
+      - name: auth-api-docs
+        paths:
+          - /auth-service/api-docs
+        strip_path: false
+        preserve_host: false
   - name: mail-service
     url: http://mail-service:8082
     routes:
@@ -64,6 +75,17 @@ services:
             config:
               secret_is_base64: true
               key_claim_name: iss
+      - name: customer-swagger-ui
+        paths:
+          - /customer-service/swagger-ui
+          - /customer-service/swagger-ui.html
+        strip_path: false
+        preserve_host: false
+      - name: customer-api-docs
+        paths:
+          - /customer-service/api-docs
+        strip_path: false
+        preserve_host: false
   - name: reward-service
     url: http://reward-service:8084
     routes:
@@ -97,6 +119,17 @@ services:
             config:
               secret_is_base64: true
               key_claim_name: iss
+      - name: reward-swagger-ui
+        paths:
+          - /reward-service/swagger-ui
+          - /reward-service/swagger-ui.html
+        strip_path: false
+        preserve_host: false
+      - name: reward-api-docs
+        paths:
+          - /reward-service/api-docs
+        strip_path: false
+        preserve_host: false
 
 
 # Global JWT plugin kaldırıldı çünkü auth endpoint'leri için JWT doğrulaması yapılmamalı
