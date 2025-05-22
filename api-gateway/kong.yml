@@ -26,7 +26,7 @@ services:
         plugins:
           - name: jwt
             config:
-              secret_is_base64: false
+              secret_is_base64: true
               key_claim_name: iss
   - name: mail-service
     url: http://mail-service:8082
