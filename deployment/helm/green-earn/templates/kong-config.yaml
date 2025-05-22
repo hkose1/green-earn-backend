@@ -29,7 +29,7 @@ data:
             plugins:
               - name: jwt
                 config:
-                  secret_is_base64: true
+                  secret_is_base64: false
                   key_claim_name: iss
       - name: mail-service
         url: http://{{ .Values.mailService.name }}:{{ .Values.mailService.service.port }}
