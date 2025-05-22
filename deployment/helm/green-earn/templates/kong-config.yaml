@@ -31,7 +31,6 @@ data:
                 config:
                   secret_is_base64: true
                   key_claim_name: iss
-                  claims_to_verify: ["exp", "nbf"]
           - name: auth-swagger-ui
             paths:
               - /auth-service/swagger-ui
