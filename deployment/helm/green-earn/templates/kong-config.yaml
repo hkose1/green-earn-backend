@@ -12,6 +12,7 @@ data:
         key: auth-service
         algorithm: HS256
         secret: "M1Y1K1ZWajZtbnh0dmVqdmtEWFg5ZEQ1V2I0dHJSSFRzM3dDcGgyNzZCbjAwSkhvT0RqTjhDMzJGUEVxcHZCRnBjTFdBNjdHS2JNejdkQTE4RWNuVGZ4YUxYRmlsZWhaZnF4Y2dQUG11elM0VlVYcGVwTzdIUDVWMGdNY0NGWjVVQjV6Q29NTmFsZklxcVF5QXhRQll1R3ZybDdQd2c1WmpGbXo0aU80R0x5dUliU2ROY2V4eTlUc084UFQwOUZ4N3RNSHN3cDhPa2Qxcnl2dHJvdVo2NGlPeXFFTnF2bU9UTCtPcDdhcHdZcVZDczk1WldWZzRHcTNkbWdDUVJCUUhtVGxVSHIvN0huWi9NQnJNazZhNXIvYjh3KzNUTlQzTUYvYjNtOGhsZW1Gd1FTVXZPM2hOaG5zb296MUp1SFlrd2FRS1VROCtRM1ZVa3JSdUtQc1ZzN3dNY0VxV05wb0RvU3krcGNaY2Fj"
+        secret_is_base64: true
     services:
       - name: auth-service
         url: http://{{ .Values.authService.name }}:{{ .Values.authService.service.port }}
