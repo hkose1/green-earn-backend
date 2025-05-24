@@ -83,93 +83,76 @@ jobs:
 
   deploy:
     needs: build-and-test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Install Helm
         run: |
-          $ErrorActionPreference = "Stop"
-          $helmVersion = "3.14.2"
-          $helmUrl = "https://get.helm.sh/helm-v$helmVersion-windows-amd64.zip"
-          $helmZip = "helm.zip"
-          $helmPath = "C:\Program Files\helm\windows-amd64"
-          
-          Invoke-WebRequest -Uri $helmUrl -OutFile $helmZip
-          Expand-Archive -Path $helmZip -DestinationPath "C:\Program Files\helm" -Force
-          
-          $currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
-          if ($currentPath -notlike "*$helmPath*") {
-            [Environment]::SetEnvironmentVariable("Path", "$currentPath;$helmPath", "Machine")
-          }
-          
-          $env:Path = "$env:Path;$helmPath"
-          
-          & "$helmPath\helm.exe" version
-          
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
+
       - name: Get AKS Credentials
         uses: azure/aks-set-context@v3
         with:
           resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
           cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
-          
-      - name: Configure kubectl
-        run: |
-          $ErrorActionPreference = "Stop"
-          
-          # Cluster bağlantısını test et
-          Write-Host "Testing cluster connection..."
-          kubectl config get-contexts
-          kubectl cluster-info
-          
+
       - name: Deploy to Kubernetes
         run: |
-          $ErrorActionPreference = "Stop"
+          set -e
+
           cd deployment/helm/green-earn
-          
-          # Önce namespace'i oluştur
+
+          echo "Creating namespace if it doesn't exist..."
           kubectl create namespace green-earn --dry-run=client -o yaml | kubectl apply -f -
-          
-          # PostgreSQL secret'ını oluştur
-          Write-Host "Creating PostgreSQL secret..."
-          kubectl create secret generic azure-postgres-secret `
-            --from-literal=host=${{ secrets.AZURE_POSTGRES_HOST }} `
-            --from-literal=port=${{ secrets.AZURE_POSTGRES_PORT }} `
-            --from-literal=database=${{ secrets.AZURE_POSTGRES_DATABASE }} `
-            --from-literal=customer-database=${{ secrets.AZURE_POSTGRES_CUSTOMER_SERVICE_DATABASE }} `
-            --from-literal=reward-database=${{ secrets.AZURE_POSTGRES_REWARD_SERVICE_DATABASE }} `
-            --from-literal=username=${{ secrets.AZURE_POSTGRES_USERNAME }} `
-            --from-literal=password=${{ secrets.AZURE_POSTGRES_PASSWORD }} `
+
+          echo "Creating PostgreSQL secret..."
+          kubectl create secret generic azure-postgres-secret \
+            --from-literal=host=${{ secrets.AZURE_POSTGRES_HOST }} \
+            --from-literal=port=${{ secrets.AZURE_POSTGRES_PORT }} \
+            --from-literal=database=${{ secrets.AZURE_POSTGRES_DATABASE }} \
+            --from-literal=customer-database=${{ secrets.AZURE_POSTGRES_CUSTOMER_SERVICE_DATABASE }} \
+            --from-literal=reward-database=${{ secrets.AZURE_POSTGRES_REWARD_SERVICE_DATABASE }} \
+            --from-literal=username=${{ secrets.AZURE_POSTGRES_USERNAME }} \
+            --from-literal=password=${{ secrets.AZURE_POSTGRES_PASSWORD }} \
             -n green-earn --dry-run=client -o yaml | kubectl apply -f -
-          
-          # Mevcut ConfigMap'leri sil
-          Write-Host "Deleting existing ConfigMaps..."
+
+          echo "Deleting existing kong configmap..."
           kubectl delete configmap kong-config -n green-earn --ignore-not-found
-          
-          
-          # Helm deployment
-          & "C:\Program Files\helm\windows-amd64\helm.exe" upgrade --install green-earn . `
-            --namespace green-earn `
-            --create-namespace `
-            --set global.environment=production `
-            --set global.acrLoginServer=${{ secrets.ACR_LOGIN_SERVER }} `
-            --set apiGateway.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-api-gateway `
-            --set apiGateway.image.tag=${{ github.sha }} `
-            --set eventBus.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-event-bus `
-            --set eventBus.image.tag=${{ github.sha }} `
-            --set serviceRegistry.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-service-registry `
-            --set serviceRegistry.image.tag=${{ github.sha }} `
-            --set authService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service `
-            --set authService.image.tag=${{ github.sha }} `
-            --set mailService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service `
-            --set mailService.image.tag=${{ github.sha }} `
-            --set customerService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service `
-            --set customerService.image.tag=${{ github.sha }} `
-            --set rewardService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service `
-            --set rewardService.image.tag=${{ github.sha }} `
+
+          echo "Preparing Helm upgrade command..."
+          helm_values=(
+            "--set global.environment=production"
+            "--set global.acrLoginServer=${{ secrets.ACR_LOGIN_SERVER }}"
+          )
+
+          declare -A services=(
+            [apiGateway]=green-earn-api-gateway
+            [eventBus]=green-earn-event-bus
+            [serviceRegistry]=green-earn-service-registry
+            [authService]=green-earn-auth-service
+            [mailService]=green-earn-mail-service
+            [customerService]=green-earn-customer-service
+            [rewardService]=green-earn-reward-service
+          )
+
+          for key in "${!services[@]}"; do
+            repo="${{ secrets.ACR_LOGIN_SERVER }}/${services[$key]}"
+            tag="${{ github.sha }}"
+            helm_values+=("--set ${key}.image.repository=${repo}")
+            helm_values+=("--set ${key}.image.tag=${tag}")
+          done
+
+          echo "Deploying with Helm..."
+          helm upgrade --install green-earn . \
+            --namespace green-earn \
+            --create-namespace \
+            "${helm_values[@]}"
