@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       
@@ -19,44 +19,25 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
           
-      - name: Install Maven
-        run: |
-          $mavenVersion = "3.9.6"
-          $mavenUrl = "https://dlcdn.apache.org/maven/maven-3/$mavenVersion/binaries/apache-maven-$mavenVersion-bin.zip"
-          $mavenZip = "maven.zip"
-          
-          Invoke-WebRequest -Uri $mavenUrl -OutFile $mavenZip
-          Expand-Archive -Path $mavenZip -DestinationPath "C:\Program Files" -Force
-          
-          $env:Path = "$env:Path;C:\Program Files\apache-maven-$mavenVersion\bin"
-          
       - name: Build Java Services
         run: |
-          $ErrorActionPreference = "Stop"
-          
-          if (Test-Path "services/mail-service/pom.xml") {
-            cd services/mail-service
-            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
-            cd ../..
-          }
-          
-          if (Test-Path "services/auth-service/pom.xml") {
-            cd services/auth-service
-            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
-            cd ../..
-          }
+          set -e
 
-          if (Test-Path "services/customer-service/pom.xml") {
-            cd services/customer-service
-            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
-            cd ../..
-          }
+          declare -A javaServices=(
+            [mail-service]="green-earn-mail-service"
+            [auth-service]="green-earn-auth-service"
+            [customer-service]="green-earn-customer-service"
+            [reward-service]="green-earn-reward-service"
+          )
 
-          if (Test-Path "services/reward-service/pom.xml") {
-            cd services/reward-service
-            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
-            cd ../..
-          }
+          for service in "${!javaServices[@]}"; do
+            if [ -f "services/$service/pom.xml" ]; then
+              echo "Building $service..."
+              cd "services/$service"
+              mvn clean install -DskipTests
+              cd ../..
+            fi
+          done
           
       - name: Login to Azure Container Registry
         uses: azure/docker-login@v1
@@ -67,66 +48,38 @@ jobs:
           
       - name: Build and Push Docker images
         run: |
-          $ErrorActionPreference = "Stop"
-          
-          # Core services
-          $coreServices = @{
-            "api-gateway" = "green-earn-api-gateway"
-            "event-bus" = "green-earn-event-bus"
-            "service-registry" = "green-earn-service-registry"
-          }
-          
-          foreach ($service in $coreServices.Keys) {
-            $dockerfilePath = "$service/Dockerfile"
-            if (Test-Path $dockerfilePath) {
-              $content = Get-Content $dockerfilePath -Raw
-              if ($content -and $content.Trim() -ne "") {
-                cd "$service"
-                Write-Host "Building and pushing $service..."
-                $imageName = "${{ secrets.ACR_LOGIN_SERVER }}/$($coreServices[$service]):${{ github.sha }}"
-                Write-Host "Image name: $imageName"
-                docker build --no-cache -t $imageName .
-                docker push $imageName
-                cd ..
-              }
-            }
-          }
-          
-          # Build and push auth-service
-          if (Test-Path "services/auth-service/Dockerfile") {
-            Write-Host "Building and pushing auth-service..."
-            cd services/auth-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service:${{ github.sha }}" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service:${{ github.sha }}"
-            cd ../..
-          }
-          
-          # Build and push mail-service
-          if (Test-Path "services/mail-service/Dockerfile") {
-            Write-Host "Building and pushing mail-service..."
-            cd services/mail-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service:${{ github.sha }}" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service:${{ github.sha }}"
-            cd ../..
-          }
+          set -e
 
-          # Build and push customer-service
-          if (Test-Path "services/customer-service/Dockerfile") {
-            Write-Host "Building and pushing customer-service..."
-            cd services/customer-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service:${{ github.sha }}" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service:${{ github.sha }}"
-            cd ../..
-          }
+          declare -A coreServices=(
+            [api-gateway]="green-earn-api-gateway"
+            [event-bus]="green-earn-event-bus"
+            [service-registry]="green-earn-service-registry"
+          )
 
-          # Build and push reward-service
-          if (Test-Path "services/reward-service/Dockerfile") {
-            Write-Host "Building and pushing reward-service..."
-            cd services/reward-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service:${{ github.sha }}" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service:${{ github.sha }}"
-            cd ../..
-          }
+          for service in "${!coreServices[@]}"; do
+            imageName="${{ secrets.ACR_LOGIN_SERVER }}/${coreServices[$service]}:${{ github.sha }}"
+            if [ -f "$service/Dockerfile" ]; then
+              echo "Building and pushing $service..."
+              docker build --no-cache -t "$imageName" "$service"
+              docker push "$imageName"
+            fi
+          done
+
+          declare -A javaServices=(
+            [mail-service]="green-earn-mail-service"
+            [auth-service]="green-earn-auth-service"
+            [customer-service]="green-earn-customer-service"
+            [reward-service]="green-earn-reward-service"
+          )
+
+          for service in "${!javaServices[@]}"; do
+            imageName="${{ secrets.ACR_LOGIN_SERVER }}/${javaServices[$service]}:${{ github.sha }}"
+            if [ -f "services/$service/Dockerfile" ]; then
+              echo "Building and pushing $service..."
+              docker build --no-cache -t "$imageName" "services/$service"
+              docker push "$imageName"
+            fi
+          done
 
   deploy:
     needs: build-and-test
