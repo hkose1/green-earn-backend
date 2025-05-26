@@ -18,20 +18,6 @@ services:
           - /api/auth  
         strip_path: false
         preserve_host: false
-      
-      - name: auth-swagger-ui
-        paths:
-          - /auth-service/swagger-ui
-          - /auth-service/swagger-ui.html
-        strip_path: true
-        preserve_host: false
-        url: http://auth-service:8081/swagger-ui/index.html
-      - name: auth-api-docs
-        paths:
-          - /auth-service/api-docs
-        strip_path: true
-        preserve_host: false
-        url: http://auth-service:8081/api-docs
       - name: users-route
         paths:
           - /api/users
@@ -42,6 +28,19 @@ services:
             config:
               secret_is_base64: true
               key_claim_name: iss
+      - name: auth-swagger-ui
+        paths:
+          - /auth-service/swagger-ui
+          - /auth-service/swagger-ui.html
+        strip_path: true
+        preserve_host: false
+        url: http://auth-service:8081/swagger-ui
+      - name: auth-api-docs
+        paths:
+          - /auth-service/api-docs
+        strip_path: true
+        preserve_host: false
+        url: http://auth-service:8081/api-docs
   - name: mail-service
     url: http://mail-service:8082
     routes:
