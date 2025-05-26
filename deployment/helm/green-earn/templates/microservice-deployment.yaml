@@ -97,6 +97,13 @@ spec:
                   name: azure-postgres-secret
                   key: reward-database
             {{- end }}
+            {{- if eq .name "challenge-service" }}
+            - name: SPRING_DATASOURCE_CHALLENGE_SERVICE_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: azure-postgres-secret
+                  key: challenge-database
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /actuator/health
