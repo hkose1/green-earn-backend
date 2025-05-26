@@ -155,4 +155,4 @@ jobs:
           helm upgrade --install green-earn . \
             --namespace green-earn \
             --create-namespace \
-            "${helm_values[@]}"
+            --set $(IFS=,; echo "${helm_values[*]}")
