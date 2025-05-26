@@ -146,6 +146,7 @@ jobs:
             [mailService]=green-earn-mail-service
             [customerService]=green-earn-customer-service
             [rewardService]=green-earn-reward-service
+            [challengeService]=green-earn-challenge-service
           )
 
           for key in "${!services[@]}"; do
