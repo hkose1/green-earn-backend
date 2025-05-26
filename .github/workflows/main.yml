@@ -117,6 +117,8 @@ jobs:
           kubectl create namespace green-earn --dry-run=client -o yaml | kubectl apply -f -
 
           echo "Creating PostgreSQL secret..."
+          kubectl delete secret azure-postgres-secret -n green-earn --ignore-not-found|| true
+          sleep 10
           kubectl create secret generic azure-postgres-secret \
             --from-literal=host=${{ secrets.AZURE_POSTGRES_HOST }} \
             --from-literal=port=${{ secrets.AZURE_POSTGRES_PORT }} \
