@@ -23,13 +23,13 @@ services:
         paths:
           - /auth-service/swagger-ui
           - /auth-service/swagger-ui.html
-        strip_path: false
+        strip_path: true
         preserve_host: false
         url: http://auth-service:8081/swagger-ui/index.html
       - name: auth-api-docs
         paths:
           - /auth-service/api-docs
-        strip_path: false
+        strip_path: true
         preserve_host: false
         url: http://auth-service:8081/api-docs
       - name: users-route
