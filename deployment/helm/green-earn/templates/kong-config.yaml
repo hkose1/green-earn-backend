@@ -35,21 +35,13 @@ data:
             paths:
               - /auth-service/swagger-ui
               - /auth-service/swagger-ui.html
-            strip_path: false
+            strip_path: true
             preserve_host: false
-            plugins:
-              - name: jwt
-                config:
-                  enabled: false
           - name: auth-api-docs
             paths:
               - /auth-service/api-docs
-            strip_path: false
+            strip_path: true
             preserve_host: false
-            plugins:
-              - name: jwt
-                config:
-                  enabled: false
       - name: mail-service
         url: http://{{ .Values.mailService.name }}:{{ .Values.mailService.service.port }}
         routes:
@@ -90,21 +82,13 @@ data:
             paths:
               - /customer-service/swagger-ui
               - /customer-service/swagger-ui.html
-            strip_path: false
+            strip_path: true
             preserve_host: false
-            plugins:
-              - name: jwt
-                config:
-                  enabled: false
           - name: customer-api-docs
             paths:
               - /customer-service/api-docs
-            strip_path: false
+            strip_path: true
             preserve_host: false
-            plugins:
-              - name: jwt
-                config:
-                  enabled: false
       - name: reward-service
         url: http://{{ .Values.rewardService.name }}:{{ .Values.rewardService.service.port }}
         routes:
@@ -142,18 +126,10 @@ data:
             paths:
               - /reward-service/swagger-ui
               - /reward-service/swagger-ui.html
-            strip_path: false
+            strip_path: true
             preserve_host: false
-            plugins:
-              - name: jwt
-                config:
-                  enabled: false
           - name: reward-api-docs
             paths:
               - /reward-service/api-docs
-            strip_path: false
+            strip_path: true
             preserve_host: false
-            plugins:
-              - name: jwt
-                config:
-                  enabled: false
