@@ -32,13 +32,15 @@ services:
         paths:
           - /auth-service/swagger-ui
           - /auth-service/swagger-ui.html
-        strip_path: true
+        strip_path: false
         preserve_host: false
+        url: http://auth-service:8081/swagger-ui/index.html
       - name: auth-api-docs
         paths:
           - /auth-service/api-docs
-        strip_path: true
+        strip_path: false
         preserve_host: false
+        url: http://auth-service:8081/api-docs
   - name: mail-service
     url: http://mail-service:8082
     routes:
