@@ -43,7 +43,7 @@ spec:
         - name: EMAIL_PASSWORD
           value: "dsak ckgs tndd okee"
         - name: VERIFY_EMAIL_HOST
-          value: "http://57.151.33.67:8000"
+          value: "http://4.157.140.60:8000"
         resources:
           {{- toYaml .Values.mailService.resources | nindent 10 }}
 ---
