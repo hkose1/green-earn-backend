@@ -81,13 +81,15 @@ services:
         paths:
           - /customer-service/swagger-ui
           - /customer-service/swagger-ui.html
-        strip_path: true
+        strip_path: false
         preserve_host: false
+        url: http://customer-service:8083/swagger-ui/index.html
       - name: customer-api-docs
         paths:
           - /customer-service/api-docs
-        strip_path: true
+        strip_path: false
         preserve_host: false
+        url: http://customer-service:8083/api-docs
   - name: reward-service
     url: http://reward-service:8084
     routes:
