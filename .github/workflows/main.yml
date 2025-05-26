@@ -19,7 +19,7 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
           
-     - name: Build Java Services with Maven
+      - name: Build Java Services with Maven
         run: |
           set -e
 
