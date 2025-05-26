@@ -126,7 +126,8 @@ jobs:
             -n green-earn --dry-run=client -o yaml | kubectl apply -f -
 
           echo "Deleting existing kong configmap..."
-          kubectl delete configmap kong-config -n green-earn --ignore-not-found
+          kubectl delete configmap kong-config -n green-earn --ignore-not-found || true
+          sleep 10
 
           echo "Preparing Helm upgrade command..."
           helm_values=(
