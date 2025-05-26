@@ -18,16 +18,7 @@ services:
           - /api/auth  
         strip_path: false
         preserve_host: false
-      - name: users-route
-        paths:
-          - /api/users
-        strip_path: false
-        preserve_host: false
-        plugins:
-          - name: jwt
-            config:
-              secret_is_base64: true
-              key_claim_name: iss
+      
       - name: auth-swagger-ui
         paths:
           - /auth-service/swagger-ui
@@ -41,6 +32,16 @@ services:
         strip_path: false
         preserve_host: false
         url: http://auth-service:8081/api-docs
+      - name: users-route
+        paths:
+          - /api/users
+        strip_path: false
+        preserve_host: false
+        plugins:
+          - name: jwt
+            config:
+              secret_is_base64: true
+              key_claim_name: iss
   - name: mail-service
     url: http://mail-service:8082
     routes:
