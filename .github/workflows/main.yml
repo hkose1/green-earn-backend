@@ -130,8 +130,8 @@ jobs:
 
           echo "Preparing Helm upgrade command..."
           helm_values=(
-            "--set global.environment=production"
-            "--set global.acrLoginServer=${{ secrets.ACR_LOGIN_SERVER }}"
+            "global.environment=production"
+            "global.acrLoginServer=${{ secrets.ACR_LOGIN_SERVER }}"
           )
 
           declare -A services=(
@@ -147,12 +147,12 @@ jobs:
           for key in "${!services[@]}"; do
             repo="${{ secrets.ACR_LOGIN_SERVER }}/${services[$key]}"
             tag="${{ github.sha }}"
-            helm_values+=("--set ${key}.image.repository=${repo}")
-            helm_values+=("--set ${key}.image.tag=${tag}")
+            helm_values+=("${key}.image.repository=${repo}")
+            helm_values+=("${key}.image.tag=${tag}")
           done
 
           echo "Deploying with Helm..."
-          helm upgrade --install green-earn . \
+          helm upgrade green-earn . \
             --namespace green-earn \
             --create-namespace \
             --set $(IFS=,; echo "${helm_values[*]}")
