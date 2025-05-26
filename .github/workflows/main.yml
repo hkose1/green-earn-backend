@@ -152,7 +152,7 @@ jobs:
           done
 
           echo "Deploying with Helm..."
-          helm upgrade green-earn . \
+          helm upgrade --install green-earn . \
             --namespace green-earn \
             --create-namespace \
             --set $(IFS=,; echo "${helm_values[*]}")
