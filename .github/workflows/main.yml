@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       
@@ -19,44 +19,25 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
           
-      - name: Install Maven
+     - name: Build Java Services with Maven
         run: |
-          $mavenVersion = "3.9.6"
-          $mavenUrl = "https://dlcdn.apache.org/maven/maven-3/$mavenVersion/binaries/apache-maven-$mavenVersion-bin.zip"
-          $mavenZip = "maven.zip"
-          
-          Invoke-WebRequest -Uri $mavenUrl -OutFile $mavenZip
-          Expand-Archive -Path $mavenZip -DestinationPath "C:\Program Files" -Force
-          
-          $env:Path = "$env:Path;C:\Program Files\apache-maven-$mavenVersion\bin"
-          
-      - name: Build Java Services
-        run: |
-          $ErrorActionPreference = "Stop"
-          
-          if (Test-Path "services/mail-service/pom.xml") {
-            cd services/mail-service
-            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
-            cd ../..
-          }
-          
-          if (Test-Path "services/auth-service/pom.xml") {
-            cd services/auth-service
-            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
-            cd ../..
-          }
+          set -e
 
-          if (Test-Path "services/customer-service/pom.xml") {
-            cd services/customer-service
-            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
-            cd ../..
-          }
+          declare -A javaServices=(
+            [mail-service]="green-earn-mail-service"
+            [auth-service]="green-earn-auth-service"
+            [customer-service]="green-earn-customer-service"
+            [reward-service]="green-earn-reward-service"
+          )
 
-          if (Test-Path "services/reward-service/pom.xml") {
-            cd services/reward-service
-            & "C:\Program Files\apache-maven-3.9.6\bin\mvn.cmd" clean install -DskipTests
-            cd ../..
-          }
+          for service in "${!javaServices[@]}"; do
+            if [ -f "services/$service/pom.xml" ]; then
+              echo "Building $service..."
+              cd "services/$service"
+              mvn clean install -DskipTests
+              cd ../..
+            fi
+          done
           
       - name: Login to Azure Container Registry
         uses: azure/docker-login@v1
@@ -65,158 +46,113 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
           
-      - name: Build and Push Docker images
+      - name: Build and Push Docker Images
         run: |
-          $ErrorActionPreference = "Stop"
-          
-          # Core services
-          $coreServices = @{
-            "api-gateway" = "green-earn-api-gateway"
-            "event-bus" = "green-earn-event-bus"
-            "service-registry" = "green-earn-service-registry"
-          }
-          
-          foreach ($service in $coreServices.Keys) {
-            $dockerfilePath = "$service/Dockerfile"
-            if (Test-Path $dockerfilePath) {
-              $content = Get-Content $dockerfilePath -Raw
-              if ($content -and $content.Trim() -ne "") {
-                cd "$service"
-                Write-Host "Building and pushing $service..."
-                $imageName = "${{ secrets.ACR_LOGIN_SERVER }}/$($coreServices[$service]):${{ github.sha }}"
-                Write-Host "Image name: $imageName"
-                docker build --no-cache -t $imageName .
-                docker push $imageName
-                cd ..
-              }
-            }
-          }
-          
-          # Build and push auth-service
-          if (Test-Path "services/auth-service/Dockerfile") {
-            Write-Host "Building and pushing auth-service..."
-            cd services/auth-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service:${{ github.sha }}" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service:${{ github.sha }}"
-            cd ../..
-          }
-          
-          # Build and push mail-service
-          if (Test-Path "services/mail-service/Dockerfile") {
-            Write-Host "Building and pushing mail-service..."
-            cd services/mail-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service:${{ github.sha }}" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service:${{ github.sha }}"
-            cd ../..
-          }
+          set -e
 
-          # Build and push customer-service
-          if (Test-Path "services/customer-service/Dockerfile") {
-            Write-Host "Building and pushing customer-service..."
-            cd services/customer-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service:${{ github.sha }}" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service:${{ github.sha }}"
-            cd ../..
-          }
+          declare -A coreServices=(
+            [api-gateway]="green-earn-api-gateway"
+            [event-bus]="green-earn-event-bus"
+            [service-registry]="green-earn-service-registry"
+          )
 
-          # Build and push reward-service
-          if (Test-Path "services/reward-service/Dockerfile") {
-            Write-Host "Building and pushing reward-service..."
-            cd services/reward-service
-            docker build --no-cache -t "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service:${{ github.sha }}" .
-            docker push "${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service:${{ github.sha }}"
-            cd ../..
-          }
+          for service in "${!coreServices[@]}"; do
+            imageName="${{ secrets.ACR_LOGIN_SERVER }}/${coreServices[$service]}:${{ github.sha }}"
+            if [ -f "$service/Dockerfile" ]; then
+              echo "Building and pushing $service..."
+              docker build --no-cache -t "$imageName" "$service"
+              docker push "$imageName"
+            fi
+          done
+
+          declare -A javaServices=(
+            [mail-service]="green-earn-mail-service"
+            [auth-service]="green-earn-auth-service"
+            [customer-service]="green-earn-customer-service"
+            [reward-service]="green-earn-reward-service"
+          )
+
+          for service in "${!javaServices[@]}"; do
+            imageName="${{ secrets.ACR_LOGIN_SERVER }}/${javaServices[$service]}:${{ github.sha }}"
+            if [ -f "services/$service/Dockerfile" ]; then
+              echo "Building and pushing $service..."
+              docker build --no-cache -t "$imageName" "services/$service"
+              docker push "$imageName"
+            fi
+          done
 
   deploy:
     needs: build-and-test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v3
       
       - name: Install Helm
-        run: |
-          $ErrorActionPreference = "Stop"
-          $helmVersion = "3.14.2"
-          $helmUrl = "https://get.helm.sh/helm-v$helmVersion-windows-amd64.zip"
-          $helmZip = "helm.zip"
-          $helmPath = "C:\Program Files\helm\windows-amd64"
-          
-          Invoke-WebRequest -Uri $helmUrl -OutFile $helmZip
-          Expand-Archive -Path $helmZip -DestinationPath "C:\Program Files\helm" -Force
-          
-          $currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
-          if ($currentPath -notlike "*$helmPath*") {
-            [Environment]::SetEnvironmentVariable("Path", "$currentPath;$helmPath", "Machine")
-          }
-          
-          $env:Path = "$env:Path;$helmPath"
-          
-          & "$helmPath\helm.exe" version
-          
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
-      - name: Get AKS Credentials
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
-          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
-          
-      - name: Configure kubectl
-        run: |
-          $ErrorActionPreference = "Stop"
-          
-          # Cluster bağlantısını test et
-          Write-Host "Testing cluster connection..."
-          kubectl config get-contexts
-          kubectl cluster-info
-          
-      - name: Deploy to Kubernetes
-        run: |
-          $ErrorActionPreference = "Stop"
-          cd deployment/helm/green-earn
-          
-          # Önce namespace'i oluştur
-          kubectl create namespace green-earn --dry-run=client -o yaml | kubectl apply -f -
-          
-          # PostgreSQL secret'ını oluştur
-          Write-Host "Creating PostgreSQL secret..."
-          kubectl create secret generic azure-postgres-secret `
-            --from-literal=host=${{ secrets.AZURE_POSTGRES_HOST }} `
-            --from-literal=port=${{ secrets.AZURE_POSTGRES_PORT }} `
-            --from-literal=database=${{ secrets.AZURE_POSTGRES_DATABASE }} `
-            --from-literal=customer-database=${{ secrets.AZURE_POSTGRES_CUSTOMER_SERVICE_DATABASE }} `
-            --from-literal=reward-database=${{ secrets.AZURE_POSTGRES_REWARD_SERVICE_DATABASE }} `
-            --from-literal=username=${{ secrets.AZURE_POSTGRES_USERNAME }} `
-            --from-literal=password=${{ secrets.AZURE_POSTGRES_PASSWORD }} `
-            -n green-earn --dry-run=client -o yaml | kubectl apply -f -
-          
-          # Mevcut ConfigMap'leri sil
-          Write-Host "Deleting existing ConfigMaps..."
-          kubectl delete configmap kong-config -n green-earn --ignore-not-found
-          
-          
-          # Helm deployment
-          & "C:\Program Files\helm\windows-amd64\helm.exe" upgrade --install green-earn . `
-            --namespace green-earn `
-            --create-namespace `
-            --set global.environment=production `
-            --set global.acrLoginServer=${{ secrets.ACR_LOGIN_SERVER }} `
-            --set apiGateway.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-api-gateway `
-            --set apiGateway.image.tag=${{ github.sha }} `
-            --set eventBus.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-event-bus `
-            --set eventBus.image.tag=${{ github.sha }} `
-            --set serviceRegistry.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-service-registry `
-            --set serviceRegistry.image.tag=${{ github.sha }} `
-            --set authService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-auth-service `
-            --set authService.image.tag=${{ github.sha }} `
-            --set mailService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-mail-service `
-            --set mailService.image.tag=${{ github.sha }} `
-            --set customerService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-customer-service `
-            --set customerService.image.tag=${{ github.sha }} `
-            --set rewardService.image.repository=${{ secrets.ACR_LOGIN_SERVER }}/green-earn-reward-service `
-            --set rewardService.image.tag=${{ github.sha }} `
+      run: |
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Get AKS Credentials
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+        cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+
+    - name: Deploy to Kubernetes
+      run: |
+        set -e
+
+        cd deployment/helm/green-earn
+
+        echo "Creating namespace if it doesn't exist..."
+        kubectl create namespace green-earn --dry-run=client -o yaml | kubectl apply -f -
+
+        echo "Creating PostgreSQL secret..."
+        kubectl create secret generic azure-postgres-secret \
+          --from-literal=host=${{ secrets.AZURE_POSTGRES_HOST }} \
+          --from-literal=port=${{ secrets.AZURE_POSTGRES_PORT }} \
+          --from-literal=database=${{ secrets.AZURE_POSTGRES_DATABASE }} \
+          --from-literal=customer-database=${{ secrets.AZURE_POSTGRES_CUSTOMER_SERVICE_DATABASE }} \
+          --from-literal=reward-database=${{ secrets.AZURE_POSTGRES_REWARD_SERVICE_DATABASE }} \
+          --from-literal=username=${{ secrets.AZURE_POSTGRES_USERNAME }} \
+          --from-literal=password=${{ secrets.AZURE_POSTGRES_PASSWORD }} \
+          -n green-earn --dry-run=client -o yaml | kubectl apply -f -
+
+        echo "Deleting existing kong configmap..."
+        kubectl delete configmap kong-config -n green-earn --ignore-not-found
+
+        echo "Preparing Helm upgrade command..."
+        helm_values=(
+          "--set global.environment=production"
+          "--set global.acrLoginServer=${{ secrets.ACR_LOGIN_SERVER }}"
+        )
+
+        declare -A services=(
+          [apiGateway]=green-earn-api-gateway
+          [eventBus]=green-earn-event-bus
+          [serviceRegistry]=green-earn-service-registry
+          [authService]=green-earn-auth-service
+          [mailService]=green-earn-mail-service
+          [customerService]=green-earn-customer-service
+          [rewardService]=green-earn-reward-service
+        )
+
+        for key in "${!services[@]}"; do
+          repo="${{ secrets.ACR_LOGIN_SERVER }}/${services[$key]}"
+          tag="${{ github.sha }}"
+          helm_values+=("--set ${key}.image.repository=${repo}")
+          helm_values+=("--set ${key}.image.tag=${tag}")
+        done
+
+        echo "Deploying with Helm..."
+        helm upgrade --install green-earn . \
+          --namespace green-earn \
+          --create-namespace \
+          "${helm_values[@]}"

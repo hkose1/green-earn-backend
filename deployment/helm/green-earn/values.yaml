@@ -176,6 +176,42 @@ rewardService:
     initialDelaySeconds: 90
     periodSeconds: 10
 
+challengeService:
+  name: challenge-service
+  replicaCount: 1
+  image:
+    repository: ${{ secrets.ACR_LOGIN_SERVER }}/green-earn-challenge-service
+    tag: latest
+  service:
+    port: 8085
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  env:
+    SPRING_DATASOURCE_HOST: ${{ secrets.AZURE_POSTGRES_HOST }}
+    SPRING_DATASOURCE_PORT: "5432"
+    SPRING_DATASOURCE_CHALLENGE_SERVICE_DATABASE: ${{ secrets.AZURE_POSTGRES_CHALLENGE_SERVICE_DATABASE }}
+    SPRING_DATASOURCE_USERNAME: ${{ secrets.AZURE_POSTGRES_USERNAME }}
+    SPRING_DATASOURCE_PASSWORD: ${{ secrets.AZURE_POSTGRES_PASSWORD }}
+    SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+  livenessProbe:
+    httpGet:
+      path: /actuator/health
+      port: 8085  
+    initialDelaySeconds: 60
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /actuator/health
+      port: 8085
+    initialDelaySeconds: 90
+    periodSeconds: 10
+
 elasticsearch:
   enabled: true
   name: elasticsearch
