@@ -47,6 +47,12 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getCustomerById(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/userId/{id}")
+    public ResponseEntity<CustomerResponseDto> getCustomerByUserId(@PathVariable UUID id) {
+        return ResponseEntity.ok(customerService.getCustomerByUserId(id));
+    }
+
     @Hidden
     @PreAuthorize("hasRole('SYSTEM')")
     @PostMapping("/internal")

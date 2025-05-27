@@ -132,4 +132,10 @@ public class CustomerService {
         customer.getCustomerPoint().setTotalPoints(customerTotalPoints - updateDto.getTotalCostPoints());
         customerRepository.save(customer);
     }
+
+    public CustomerResponseDto getCustomerByUserId(UUID id) {
+        return customerMapper.map2ResponseDto(
+                customerRepository.findCustomerEntityByUserId(id).orElseThrow(() -> new RuntimeException("Customer not found with user id: " + id))
+        );
+    }
 }
