@@ -138,4 +138,18 @@ public class CustomerService {
                 customerRepository.findCustomerEntityByUserId(id).orElseThrow(() -> new RuntimeException("Customer not found with user id: " + id))
         );
     }
+
+    public CustomerResponseDto updateCustomerByUserId(UUID userId,
+                                                      UpdateCustomerRequestDto updateCustomerRequestDto) {
+        CustomerEntity customer = customerRepository.findCustomerEntityByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Customer not found  with user id: " + userId));
+        if (updateCustomerRequestDto.getPhoneNumber() != null) {
+            customer.setPhoneNumber(updateCustomerRequestDto.getPhoneNumber());
+        }
+        if (updateCustomerRequestDto.getProfileImageUrl() != null) {
+            customer.setProfileImageUrl(updateCustomerRequestDto.getProfileImageUrl());
+        }
+
+        return customerMapper.map2ResponseDto(customerRepository.save(customer));
+    }
 }

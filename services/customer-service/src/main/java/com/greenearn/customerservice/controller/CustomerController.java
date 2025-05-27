@@ -53,6 +53,13 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getCustomerByUserId(id));
     }
 
+    @PatchMapping("/{userId}")
+    public ResponseEntity<CustomerResponseDto> updateCustomerByUserId(
+            @PathVariable("userId") UUID userId,
+            @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
+        return ResponseEntity.ok(customerService.updateCustomerByUserId(userId, updateCustomerRequestDto));
+    }
+
     @Hidden
     @PreAuthorize("hasRole('SYSTEM')")
     @PostMapping("/internal")
