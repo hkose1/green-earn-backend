@@ -42,7 +42,6 @@ data:
               - /auth-service/api-docs/swagger-config
             strip_path: true
             preserve_host: false
-            url: http://auth-service:8081/api-docs
       - name: mail-service
         url: http://{{ .Values.mailService.name }}:{{ .Values.mailService.service.port }}
         routes:
