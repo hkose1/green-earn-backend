@@ -38,6 +38,7 @@ data:
               - /auth-service/swagger-ui/index.html
               - /auth-service/swagger-resources
               - /auth-service/webjars
+              - /auth-service/api-docs/swagger-config
             strip_path: true
             preserve_host: false
           - name: auth-api-docs
