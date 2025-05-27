@@ -24,6 +24,17 @@ public class BottleTransactionController {
 
     private final BottleTransactionService bottleTransactionService;
 
+    @GetMapping("/me")
+    public ResponseEntity<List<BottleTransactionResponseDto>> getMyAllBottleTransactions(Authentication authentication) {
+        return ResponseEntity.ok(bottleTransactionService.getMyAllBottleTransactions(authentication));
+    }
+
+    @GetMapping("/me/{id}")
+    public ResponseEntity<BottleTransactionResponseDto> getMyBottleTransactionById(Authentication authentication,
+                                                                                   @PathVariable UUID id) {
+        return ResponseEntity.ok(bottleTransactionService.getMyBottleTransactionById(authentication, id));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<BottleTransactionResponseDto>> getAllBottleTransactions() {
