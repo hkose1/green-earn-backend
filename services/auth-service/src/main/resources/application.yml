@@ -73,7 +73,7 @@ gateway:
 
 openapi:
   server:
-    url: ${gateway.url}/${spring.application.name}
+    url: http://${spring.application.name}:${server.port}
 
 springdoc:
   api-docs:
