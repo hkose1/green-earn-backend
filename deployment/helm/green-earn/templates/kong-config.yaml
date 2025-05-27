@@ -33,7 +33,11 @@ data:
                   key_claim_name: iss
           - name: auth-swagger-ui
             paths:
-              - /auth-service/swagger
+              - /auth-service/swagger-ui
+              - /auth-service/swagger-ui.html
+              - /auth-service/swagger-ui/index.html
+              - /auth-service/swagger-resources
+              - /auth-service/webjars
             strip_path: true
             preserve_host: false
           - name: auth-api-docs

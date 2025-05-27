@@ -73,7 +73,7 @@ gateway:
 
 openapi:
   server:
-    url: ${gateway.url}
+    url: ${gateway.url}/${spring.application.name}
 
 springdoc:
   api-docs:
@@ -87,4 +87,5 @@ springdoc:
     filter: true
     config-url: /api-docs/swagger-config
     url: /api-docs
+    disable-swagger-default-url: true
   packages-to-scan: com.greenearn.authservice.controller
