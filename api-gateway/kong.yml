@@ -30,17 +30,14 @@ services:
               key_claim_name: iss
       - name: auth-swagger-ui
         paths:
-          - /auth-service/swagger-ui
-          - /auth-service/swagger-ui.html
+          - /auth-service/swagger
         strip_path: true
         preserve_host: false
-        url: http://auth-service:8081/swagger-ui
       - name: auth-api-docs
         paths:
-          - /auth-service/api-docs
+          - /auth-service/docs
         strip_path: true
         preserve_host: false
-        url: http://auth-service:8081/api-docs
   - name: mail-service
     url: http://mail-service:8082
     routes:
