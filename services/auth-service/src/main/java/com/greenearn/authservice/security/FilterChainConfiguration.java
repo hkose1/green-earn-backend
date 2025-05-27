@@ -34,8 +34,11 @@ public class FilterChainConfiguration {
             "/v3/api-docs/**",
             "/api-docs/**",
             "/swagger-resources/**",
-            "/webjars/**",     
-            "/swagger-ui/index.html"
+            "/webjars/**",
+            "/swagger-ui/index.html",
+            "/api-docs/swagger-config",
+            "/auth-service/api-docs/**",
+            "/auth-service/swagger/**"
     };
 
     @Bean
