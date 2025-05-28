@@ -82,11 +82,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/reset-password-request")
-    public ResponseEntity<ApiResponse<Void>> resetPasswordRequest(@RequestBody String email,
+    public ResponseEntity<ApiResponse<Void>> resetPasswordRequest(@RequestBody @Valid ResetPasswordRequestDto requestDto,
                                                                   HttpServletRequest request) {
 
-        this.authenticationService.resetPasswordRequest(email);
-        return ResponseEntity.ok().body(RequestUtils.getApiResponse(request, null, "Reset password request has been sent to the " + email, HttpStatus.OK));
+        this.authenticationService.resetPasswordRequest(requestDto);
+        return ResponseEntity.ok().body(RequestUtils.getApiResponse(request, null, "Reset password request has been sent to the " + requestDto.getEmail(), HttpStatus.OK));
     }
 
     @PostMapping("/reset-password")

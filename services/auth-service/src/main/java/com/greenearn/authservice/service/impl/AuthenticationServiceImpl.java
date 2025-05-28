@@ -150,8 +150,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void resetPasswordRequest(String email) {
-        var user = getUserEntityByEmail(email);
+    public void resetPasswordRequest(ResetPasswordRequestDto resetPasswordRequestDto) {
+        var user = getUserEntityByEmail(resetPasswordRequestDto.getEmail());
         Optional<CodeConfirmationEntity> existCodeConfirmationEntity = codeConfirmationRepository.findByUserId(user.getId());
         if (existCodeConfirmationEntity.isPresent()) {
             codeConfirmationRepository.deleteByUserId(user.getId());
@@ -194,7 +194,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private UserEntity getUserEntityByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiException("User not found"));
+                .orElseThrow(() -> new ApiException("No account found with this email: " + email));
     }
 
 

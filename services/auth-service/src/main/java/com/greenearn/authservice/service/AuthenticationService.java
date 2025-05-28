@@ -14,7 +14,7 @@ public interface AuthenticationService {
 
     void verifyAccountCode(String code);
 
-    void resetPasswordRequest(String email);
+    void resetPasswordRequest(ResetPasswordRequestDto resetPasswordRequestDto);
 
     void resetPassword(String code, PasswordResetRequest passwordResetRequest);
 
