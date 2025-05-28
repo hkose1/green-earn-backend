@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.greenearn.authservice.exception.custom.ApiException;
 import com.greenearn.authservice.security.UserDetailsImpl;
 
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -18,9 +19,7 @@ public final class UserUtils {
     }
 
     public static boolean checkPasswordsAreEqual(final String password, final String confirmPassword) {
-        if (password == null || confirmPassword == null) return false;
-        if (validateString(password) || validateString(confirmPassword)) return false;
-        return password.equals(confirmPassword);
+        return Objects.equals(password, confirmPassword);
     }
 
     public static UUID getCurrentUserId() {

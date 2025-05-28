@@ -91,7 +91,7 @@ public class AuthenticationController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@RequestParam("code") String code,
-                                                           @RequestBody PasswordResetRequest passwordResetRequest,
+                                                           @RequestBody @Valid PasswordResetRequest passwordResetRequest,
                                                            HttpServletRequest request) {
         authenticationService.resetPassword(code, passwordResetRequest);
         return ResponseEntity.ok().body(RequestUtils.getApiResponse(request, null, "Password updated", HttpStatus.OK));
