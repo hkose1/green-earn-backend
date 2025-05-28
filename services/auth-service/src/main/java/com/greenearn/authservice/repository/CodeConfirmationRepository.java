@@ -14,13 +14,7 @@ import java.util.UUID;
 public interface CodeConfirmationRepository extends JpaRepository<CodeConfirmationEntity, UUID>  {
 
     Optional<CodeConfirmationEntity> findByCode(String code);
-
-
-    @Query(nativeQuery = true, value = "SELECT * FROM code_confirmations WHERE user_id LIKE :userId")
-    Optional<CodeConfirmationEntity> findByUserId(@Param("userId") UUID userId);
-
-    @Modifying
+    Optional<CodeConfirmationEntity> findByUserEntityId(UUID userEntityId);
     @Transactional
-    @Query(nativeQuery = true, value = "DELETE FROM code_confirmations WHERE user_id LIKE :userId")
-    void deleteByUserId(@Param("userId") UUID userId);
+    void deleteByUserEntityId(UUID userEntityId);
 }
