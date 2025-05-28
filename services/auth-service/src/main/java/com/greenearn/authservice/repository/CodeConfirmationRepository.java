@@ -16,11 +16,11 @@ public interface CodeConfirmationRepository extends JpaRepository<CodeConfirmati
     Optional<CodeConfirmationEntity> findByCode(String code);
 
 
-    @Query(nativeQuery = true, value = "SELECT * FROM docdatabase.code_confirmations WHERE user_id LIKE :userId")
+    @Query(nativeQuery = true, value = "SELECT * FROM code_confirmations WHERE user_id LIKE :userId")
     Optional<CodeConfirmationEntity> findByUserId(@Param("userId") UUID userId);
 
     @Modifying
     @Transactional
-    @Query(nativeQuery = true, value = "DELETE FROM docdatabase.code_confirmations WHERE user_id LIKE :userId")
+    @Query(nativeQuery = true, value = "DELETE FROM code_confirmations WHERE user_id LIKE :userId")
     void deleteByUserId(@Param("userId") UUID userId);
 }
