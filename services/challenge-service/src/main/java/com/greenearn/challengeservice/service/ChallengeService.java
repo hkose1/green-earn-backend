@@ -82,13 +82,15 @@ public class ChallengeService {
     public void subscribe(Authentication authentication, SubscribeToChallengeRequestDto subscribeRequestDto) {
         ChallengeEntity challengeEntity = challengeRepository.findById(subscribeRequestDto.getChallengeId())
                 .orElseThrow(() -> new RuntimeException("Challenge not found with id: " + subscribeRequestDto.getChallengeId()));
+
+        if (challengeEntity.getChallengeStatus() == ChallengeStatus.INACTIVE) {
+            throw new RuntimeException("Challenge is inactive");
+        }
+
         if (isChallengeHasExpired(challengeEntity)) {
             challengeEntity.setChallengeStatus(ChallengeStatus.INACTIVE);
             challengeRepository.save(challengeEntity);
             throw new RuntimeException("Challenge has expired and now become inactive");
-        }
-        if (challengeEntity.getChallengeStatus() == ChallengeStatus.INACTIVE) {
-            throw new RuntimeException("Challenge is inactive");
         }
 
         UUID currentUserId = null;
@@ -98,6 +100,12 @@ public class ChallengeService {
             log.error("Failed to get current user: ", e);
             throw new RuntimeException("Failed to get current user: error: ", e);
         }
+
+        if (challengeSubscriptionRepository
+                .findByChallengeIdAndUserId(challengeEntity.getId(), currentUserId).isPresent()) {
+            throw new RuntimeException("Challenge has already been subscribed");
+        }
+
         try {
             ChallengeSubscriptionEntity challengeSubscriptionEntity = ChallengeSubscriptionEntity.builder()
                     .challengeId(subscribeRequestDto.getChallengeId())
