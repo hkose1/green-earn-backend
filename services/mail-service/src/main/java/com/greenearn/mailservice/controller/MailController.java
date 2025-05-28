@@ -28,4 +28,9 @@ public class MailController {
     public void sendCodeAccountVerificationMail(@RequestBody SendCodeMailDto sendMailDto) {
         mailService.sendCodeAccountVerificationMail(sendMailDto);
     }
+
+    @PostMapping("/send/reset-password/code")
+    public void sendCodeResetPasswordMail(@RequestBody SendCodeMailDto sendMailDto) {
+        mailService.sendCodeResetPasswordMail(sendMailDto);
+    }
 }

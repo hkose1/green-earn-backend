@@ -64,5 +64,18 @@ public class MailServiceImpl implements MailService {
 
     }
 
-
+    @Override
+    public void sendCodeResetPasswordMail(SendCodeMailDto sendMailDto) {
+        try {
+            var message = new SimpleMailMessage();
+            message.setSubject(PASSWORD_RESET_REQUEST);
+            message.setFrom(fromEmail);
+            message.setTo(sendMailDto.getTo());
+            message.setText(MailUtils.getCodeResetPasswordEmailMessage(sendMailDto.getName(), sendMailDto.getCode()));
+            mailSender.send(message);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException("Unable to send email for reset password");
+        }
+    }
 }

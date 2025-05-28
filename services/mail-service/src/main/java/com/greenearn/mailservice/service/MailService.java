@@ -10,4 +10,6 @@ public interface MailService {
     void sendPasswordResetEmail(String name, String to, String token);
 
     void sendCodeAccountVerificationMail(SendCodeMailDto sendMailDto);
+
+    void sendCodeResetPasswordMail(SendCodeMailDto sendMailDto);
 }
