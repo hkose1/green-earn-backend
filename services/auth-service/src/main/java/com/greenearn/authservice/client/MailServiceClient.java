@@ -15,4 +15,7 @@ public interface MailServiceClient {
 
     @PostMapping("/api/mail/send/account-verification/code")
     void sendCodeAccountVerificationMail(@RequestBody SendCodeMailDto sendCodeMailDto);
+
+    @PostMapping("/api/mail/send/reset-password/code")
+    void sendCodeResetPasswordMail(@RequestBody SendCodeMailDto sendCodeMailDto);
 }

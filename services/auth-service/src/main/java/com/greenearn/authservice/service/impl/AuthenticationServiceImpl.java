@@ -151,14 +151,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void resetPasswordRequest(String email) {
         var user = getUserEntityByEmail(email);
-        Optional<ConfirmationEntity> existsConfirmationEntity = confirmationRepository.findByUserId(user.getId());
-        if (existsConfirmationEntity.isPresent()) {
-            confirmationRepository.deleteByUserId(user.getId());
+        Optional<CodeConfirmationEntity> existCodeConfirmationEntity = codeConfirmationRepository.findByUserId(user.getId());
+        if (existCodeConfirmationEntity.isPresent()) {
+            codeConfirmationRepository.deleteByUserId(user.getId());
         }
 
-        ConfirmationEntity confirmationEntity = new ConfirmationEntity(user);
-        confirmationRepository.save(confirmationEntity);
-        // todo: add event publisher (send mail to the user for resetting the password)
+        CodeConfirmationEntity codeConfirmationEntity = new CodeConfirmationEntity(user);
+        codeConfirmationRepository.save(codeConfirmationEntity);
+        eventPublisher.publishEvent(
+                new UserEvent(
+                        user,
+                        EventType.RESET_PASSWORD,
+                        Map.of("code", codeConfirmationEntity.getCode())
+                )
+        );
     }
 
     @Override

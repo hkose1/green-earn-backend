@@ -40,6 +40,14 @@ public class AuthEventListener {
                         .build();
                 mailServiceClient.sendCodeAccountVerificationMail(codeMailDto);
             }
+            case RESET_PASSWORD -> {
+                SendCodeMailDto codeMailDto = SendCodeMailDto.builder()
+                        .name(event.getUser().getUsername())
+                        .to(event.getUser().getEmail())
+                        .code((String) event.getData().get("code"))
+                        .build();
+                mailServiceClient.sendCodeResetPasswordMail(codeMailDto);
+            }
             case CREATE_CUSTOMER -> {
                 CreateCustomerRequestDto customerRequestDto = userMapper
                         .mapEntityToCreateCustomerRequestDto(event.getUser());
