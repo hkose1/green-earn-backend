@@ -14,7 +14,8 @@ import java.security.SecureRandom;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "code_confirmations")
+@Entity
+@Table(name = "code_confirmations")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class CodeConfirmationEntity  extends Auditable {
 
