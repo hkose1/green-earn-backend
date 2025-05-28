@@ -42,6 +42,7 @@ public class BottleTransactionService {
         } catch (Exception e) {
             log.error(e.getMessage());
             bottleTransactionEntity.setBottleTransactionStatus(BottleTransactionStatus.FAILED);
+            bottleTransactionEntity.setEarnedPoints(0);
             bottleTransactionRepository.save(bottleTransactionEntity);
         }
     }

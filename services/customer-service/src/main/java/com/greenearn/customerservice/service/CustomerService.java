@@ -1,11 +1,16 @@
 package com.greenearn.customerservice.service;
 
 
+import com.greenearn.customerservice.client.enums.ChallengeDuration;
+import com.greenearn.customerservice.client.request.ProgressInformationRequestDto;
+import com.greenearn.customerservice.client.response.ProgressInformationResponseDto;
 import com.greenearn.customerservice.client.response.UpdateCustomerPointsResponseDto;
 import com.greenearn.customerservice.dto.*;
+import com.greenearn.customerservice.entity.BottleTransactionEntity;
 import com.greenearn.customerservice.entity.CustomerEntity;
 import com.greenearn.customerservice.entity.CustomerPointEntity;
 import com.greenearn.customerservice.mapper.CustomerMapper;
+import com.greenearn.customerservice.repository.BottleTransactionRepository;
 import com.greenearn.customerservice.repository.CustomerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
@@ -27,6 +34,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     private final CurrentCustomerService currentCustomerService;
+    private final BottleTransactionRepository bottleTransactionRepository;
 
     public void createCustomer(CreateCustomerRequestDto createCustomerRequestDto) {
         Optional<CustomerEntity> customer = customerRepository
@@ -151,5 +159,39 @@ public class CustomerService {
         }
 
         return customerMapper.map2ResponseDto(customerRepository.save(customer));
+    }
+
+    public ProgressInformationResponseDto getMyProgressOnChallenge(ProgressInformationRequestDto requestDto,
+                                                                   Authentication authentication) {
+        final UUID customerId = currentCustomerService.getCurrentCustomerId(authentication);
+        final LocalDateTime start = requestDto.getUserJoinedDateTime();
+        final LocalDateTime end = calculateEndDate(start, requestDto.getChallengeDuration());
+        List<BottleTransactionEntity> bottleTransactionEntities =
+                bottleTransactionRepository.findByCustomerIdAndCreatedAtBetween(
+                        customerId,
+                        start,
+                        end
+                );
+        AtomicReference<Integer> small = new AtomicReference<>(0);
+        AtomicReference<Integer> medium = new AtomicReference<>(0);
+        AtomicReference<Integer> large = new AtomicReference<>(0);
+        bottleTransactionEntities.forEach(bottleTransactionEntity -> {
+            small.updateAndGet(v -> v + bottleTransactionEntity.getNumberOfSmallBottles());
+            medium.updateAndGet(v -> v + bottleTransactionEntity.getNumberOfMediumBottles());
+            large.updateAndGet(v -> v + bottleTransactionEntity.getNumberOfLargeBottles());
+        });
+        return ProgressInformationResponseDto.builder()
+                .numberOfSmallBottlesForJoinedChallenge(small.get())
+                .numberOfMediumBottlesForJoinedChallenge(medium.get())
+                .numberOfLargeBottlesForJoinedChallenge(large.get())
+                .build();
+    }
+
+    private LocalDateTime calculateEndDate(LocalDateTime startDate, ChallengeDuration duration) {
+        return switch (duration) {
+            case ONE_DAY -> startDate.plusDays(1);
+            case ONE_WEEK -> startDate.plusWeeks(1);
+            case ONE_MONTH -> startDate.plusMonths(1);
+        };
     }
 }

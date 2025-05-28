@@ -1,6 +1,8 @@
 package com.greenearn.customerservice.controller;
 
 
+import com.greenearn.customerservice.client.request.ProgressInformationRequestDto;
+import com.greenearn.customerservice.client.response.ProgressInformationResponseDto;
 import com.greenearn.customerservice.client.response.UpdateCustomerPointsResponseDto;
 import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
 import com.greenearn.customerservice.dto.CustomerResponseDto;
@@ -87,6 +89,13 @@ public class CustomerController {
                                                Authentication authentication) {
         customerService.updateMyPoints(authentication, updateDto);
         return ResponseEntity.ok().build();
+    }
+
+    @Hidden
+    @PostMapping("/internal/me/progress-on-challenge")
+    public ResponseEntity<ProgressInformationResponseDto> getMyProgressOnChallenge(@RequestBody ProgressInformationRequestDto requestDto,
+                                                                                   Authentication authentication) {
+        return ResponseEntity.ok(customerService.getMyProgressOnChallenge(requestDto, authentication));
     }
 
     @Hidden
