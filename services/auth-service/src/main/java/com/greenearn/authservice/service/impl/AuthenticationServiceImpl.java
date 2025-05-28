@@ -37,6 +37,7 @@ import com.greenearn.authservice.service.AuthenticationService;
 import com.greenearn.authservice.util.UserUtils;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -168,16 +169,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void resetPassword(String key, PasswordResetRequest passwordResetRequest) {
-        var confirmationEntity = getUserConfirmation(key);
+    public void resetPassword(String code, PasswordResetRequest passwordResetRequest) {
+        var codeConfirmationEntity = getUserCodeConfirmation(code);
         if (!UserUtils.checkPasswordsAreEqual(passwordResetRequest.getPassword(), passwordResetRequest.getConfirmPassword())) {
             throw new ApiException("Passwords do not match");
         }
-        UserEntity user = userRepository.findByEmail(confirmationEntity.getUserEntity().getEmail())
+        UserEntity user = userRepository.findByEmail(codeConfirmationEntity.getUserEntity().getEmail())
                         .orElseThrow(() -> new ApiException("No account found for this email"));
         user.setPassword(passwordEncoder.encode(passwordResetRequest.getPassword()));
         userRepository.save(user);
-        confirmationRepository.delete(confirmationEntity);
+        codeConfirmationRepository.delete(codeConfirmationEntity);
     }
 
 

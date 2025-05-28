@@ -16,6 +16,6 @@ public interface AuthenticationService {
 
     void resetPasswordRequest(String email);
 
-    void resetPassword(String key, PasswordResetRequest passwordResetRequest);
+    void resetPassword(String code, PasswordResetRequest passwordResetRequest);
 
 }
