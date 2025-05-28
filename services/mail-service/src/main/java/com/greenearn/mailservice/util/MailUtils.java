@@ -19,7 +19,7 @@ public class MailUtils {
 
     public static String getCodeResetPasswordEmailMessage(String name, String code) {
         return "Hello " + name + ",\n\n" +
-                "You requested to reset your password. Please use the following 6-digit code to reset your account:\n\n" +
+                "You requested to reset your password. Please use the following 6-digit code to reset your password:\n\n" +
                 "Security Code: " + code + "\n\n" +
                 "This code will expire in 30 minutes.\n" +
                 "If you didn't request this, please ignore this email.\n\n" +
