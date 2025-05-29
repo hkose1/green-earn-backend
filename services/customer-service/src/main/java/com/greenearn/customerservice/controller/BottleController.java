@@ -40,7 +40,7 @@ public class BottleController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updateBottlePointById(@PathVariable("id") UUID bottleId, Integer newBottlePoint) {
+    public ResponseEntity<Void> updateBottlePointById(@PathVariable("id") UUID bottleId, @RequestBody Integer newBottlePoint) {
         bottleService.updateBottlePointById(bottleId, newBottlePoint);
         return ResponseEntity.ok().build();
     }
