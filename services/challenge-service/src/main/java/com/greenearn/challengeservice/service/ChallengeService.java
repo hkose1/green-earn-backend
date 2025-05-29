@@ -125,11 +125,12 @@ public class ChallengeService {
         );
     }
 
-    public List<ChallengeResponseDto> getAllChallenges() {
+    public List<ChallengeResponseDto> getAllChallenges(Authentication authentication) {
         try {
+            UUID currentUserId = UserUtils.getCurrentUserId(authentication);
             List<ChallengeResponseDto> challengeResponseDtoList = challengeRepository.findAll()
                     .stream()
-                    .map(challengeEntity -> challengeMapper.mapEntity2ResponseDto(challengeEntity))
+                    .map(challengeEntity -> challengeMapper.mapEntity2ResponseDto(challengeEntity, currentUserId))
                     .toList();
             return challengeResponseDtoList;
         } catch (Exception e) {
@@ -138,10 +139,12 @@ public class ChallengeService {
         }
     }
 
-    public ChallengeResponseDto getChallengeById(UUID challengeId) {
+    public ChallengeResponseDto getChallengeById(UUID challengeId, Authentication authentication) {
+        UUID currentUserId = UserUtils.getCurrentUserId(authentication);
         return challengeMapper.mapEntity2ResponseDto(
                 challengeRepository.findById(challengeId)
-                        .orElseThrow(() -> new RuntimeException("Failed to find challenge with id: " + challengeId))
+                        .orElseThrow(() -> new RuntimeException("Failed to find challenge with id: " + challengeId)),
+                currentUserId
         );
     }
 

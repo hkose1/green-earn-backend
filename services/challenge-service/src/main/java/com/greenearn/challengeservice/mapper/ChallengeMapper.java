@@ -9,6 +9,8 @@ import com.greenearn.challengeservice.service.ChallengeSubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class ChallengeMapper {
@@ -44,11 +46,16 @@ public class ChallengeMapper {
                 .build();
     }
 
-    public ChallengeResponseDto mapEntity2ResponseDto(ChallengeEntity challengeEntity) {
+    public ChallengeResponseDto mapEntity2ResponseDto(ChallengeEntity challengeEntity, UUID currentUserId) {
+
         return ChallengeResponseDto.builder()
                 .challengeDuration(challengeEntity.getChallengeDuration())
                 .id(challengeEntity.getId())
                 .endDate(challengeEntity.getEndDate())
+                .isSubscribed(challengeSubscriptionService.findIsSubscribedByChallengeIdAndUserId(
+                        challengeEntity.getId(),
+                        currentUserId
+                ))
                 .returnedPoints(challengeEntity.getReturnedPoints())
                 .createdAt(challengeEntity.getCreatedAt())
                 .challengeStatus(challengeEntity.getChallengeStatus())

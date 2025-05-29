@@ -1,7 +1,6 @@
 package com.greenearn.challengeservice.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.greenearn.challengeservice.enums.ChallengeDuration;
 import com.greenearn.challengeservice.enums.ChallengeStatus;
 import lombok.Builder;
@@ -13,7 +12,6 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Builder
 public class ChallengeResponseDto {
     private UUID id;
@@ -25,5 +23,6 @@ public class ChallengeResponseDto {
     private ChallengeDuration challengeDuration;
     private ChallengeStatus challengeStatus;
     private ChallengeConditionDto challengeConditionDto;
+    private Boolean isSubscribed;
 
 }

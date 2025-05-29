@@ -24,4 +24,10 @@ public class ChallengeSubscriptionService {
                 .map(ChallengeSubscriptionEntity::getUserId)
                 .toList();
     }
+
+    public Boolean findIsSubscribedByChallengeIdAndUserId(UUID challengeId, UUID userId) {
+        ChallengeSubscriptionEntity challengeSubscriptionEntity = challengeSubscriptionRepository
+                .findByChallengeIdAndUserId(challengeId, userId).orElse(null);
+        return challengeSubscriptionEntity != null;
+    }
 }

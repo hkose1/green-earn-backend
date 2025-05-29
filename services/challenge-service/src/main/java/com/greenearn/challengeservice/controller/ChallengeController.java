@@ -61,13 +61,14 @@ public class ChallengeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ChallengeResponseDto>> getAllChallenges() {
-        return ResponseEntity.ok(challengeService.getAllChallenges());
+    public ResponseEntity<List<ChallengeResponseDto>> getAllChallenges(Authentication authentication) {
+        return ResponseEntity.ok(challengeService.getAllChallenges(authentication));
     }
 
     @GetMapping("/{challengeId}")
-    public ResponseEntity<ChallengeResponseDto> getChallengeById(@PathVariable("challengeId") UUID challengeId) {
-        return ResponseEntity.ok(challengeService.getChallengeById(challengeId));
+    public ResponseEntity<ChallengeResponseDto> getChallengeById(@PathVariable("challengeId") UUID challengeId,
+                                                                 Authentication authentication) {
+        return ResponseEntity.ok(challengeService.getChallengeById(challengeId, authentication));
     }
 
 }
