@@ -97,6 +97,7 @@ public class RewardService {
                 .build();
         RewardTransactionEntity rewardTransaction = RewardTransactionEntity.builder()
                 .userId(userId)
+                .rewardTitle(reward.getTitle())
                 .rewardTransactionStatus(RewardTransactionStatus.SUCCESS)
                 .rewardCategory(reward.getRewardCategory())
                 .brandType(reward.getRewardProvider().getBrandType())

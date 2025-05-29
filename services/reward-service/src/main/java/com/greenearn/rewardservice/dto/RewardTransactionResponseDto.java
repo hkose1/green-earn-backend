@@ -1,6 +1,5 @@
 package com.greenearn.rewardservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.greenearn.rewardservice.enums.BrandType;
 import com.greenearn.rewardservice.enums.RewardCategory;
 import com.greenearn.rewardservice.enums.RewardTransactionStatus;
@@ -13,10 +12,10 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Builder
 public class RewardTransactionResponseDto {
     private UUID id;
+    private String rewardTitle;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private UUID userId;

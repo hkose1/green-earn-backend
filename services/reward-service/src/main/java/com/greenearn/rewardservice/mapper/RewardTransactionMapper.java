@@ -11,6 +11,7 @@ public class RewardTransactionMapper {
     public static RewardTransactionResponseDto map2ResponseDto(RewardTransactionEntity rewardTransaction) {
         return RewardTransactionResponseDto.builder()
                 .id(rewardTransaction.getId())
+                .rewardTitle(rewardTransaction.getRewardTitle())
                 .rewardTransactionStatus(rewardTransaction.getRewardTransactionStatus())
                 .rewardCategory(rewardTransaction.getRewardCategory())
                 .createdAt(rewardTransaction.getCreatedAt())

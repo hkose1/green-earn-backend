@@ -28,6 +28,7 @@ public class RewardTransactionEntity extends Auditable {
     @Enumerated(EnumType.STRING)
     private BrandType brandType;
     private Integer quantity;
+    private String rewardTitle;
     private Integer totalCostPoint;
     private String failureMessage;
 
