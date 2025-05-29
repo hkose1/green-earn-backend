@@ -219,6 +219,7 @@ challengeService:
 secrets:
   jwtSecretInKong: ${{ secrets.JWT_SECRET_IN_KONG }}
   jwtSecretAlgorithm: ${{ secrets.JWT_SECRET_ALGORITHM }}
+  jwtSecretInService: ${{ secrets.JWT_SECRET_IN_SERVICE }}
 
 elasticsearch:
   enabled: true
