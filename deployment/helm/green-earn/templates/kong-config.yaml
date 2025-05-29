@@ -137,6 +137,19 @@ data:
               - /reward-service/api-docs
             strip_path: true
             preserve_host: false
+      - name: challenge-service
+        url: http://{{ .Values.challengeService.name }}:{{ .Values.challengeService.service.port }}
+        routes:
+          - name: challenge-route
+            paths:
+              - /api/challenges
+            strip_path: false
+            preserve_host: false
+            plugins:
+              - name: jwt
+                config:
+                  secret_is_base64: true
+                  key_claim_name: iss
     plugins:
           - name: cors
             config:
