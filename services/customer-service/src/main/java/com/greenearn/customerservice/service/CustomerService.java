@@ -96,7 +96,7 @@ public class CustomerService {
 
     public List<CustomerResponseDto> getAllCustomersByUserIds(List<UUID> userIds) {
         try {
-            return customerRepository.findCustomerEntitiesByUserIdIs(userIds)
+            return customerRepository.findCustomerEntitiesByUserIdIn(userIds)
                     .stream()
                     .map(customerEntity -> customerMapper.map2ResponseDto(customerEntity))
                     .toList();

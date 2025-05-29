@@ -13,5 +13,5 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, UUID> 
 
     Optional<CustomerEntity> findCustomerEntityByUserId(UUID customerId);
 
-    List<CustomerEntity> findCustomerEntitiesByUserIdIs(List<UUID> userIds);
+    List<CustomerEntity> findCustomerEntitiesByUserIdIn(List<UUID> userIds);
 }

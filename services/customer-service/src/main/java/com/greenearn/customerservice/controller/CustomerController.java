@@ -45,7 +45,7 @@ public class CustomerController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
+    @PostMapping("/search/by-user-ids")
     public ResponseEntity<List<CustomerResponseDto>> getAllCustomersByUserIds(@RequestBody List<UUID> userIds) {
         return ResponseEntity.ok(customerService.getAllCustomersByUserIds(userIds));
     }
