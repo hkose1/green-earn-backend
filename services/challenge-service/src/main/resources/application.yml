@@ -67,7 +67,6 @@ logging:
 
 jwt:
   secret: ${SPRING_JWT_SECRET}
-  expiration: 604800000
 
 gateway:
   url: http://57.151.33.67:8000
