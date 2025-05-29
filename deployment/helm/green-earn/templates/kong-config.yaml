@@ -10,8 +10,8 @@ data:
     jwt_secrets:
       - consumer: auth-service
         key: auth-service
-        algorithm: HS256
-        secret: {{ .Values.secrets.jwtSecretInKong }}
+        algorithm: {{ .Values.secretsValues.jwtSecretAlgorithm }}
+        secret: {{ .Values.secretsValues.jwtSecretInKong }}
     services:
       - name: auth-service
         url: http://{{ .Values.authService.name }}:{{ .Values.authService.service.port }}
