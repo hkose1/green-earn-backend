@@ -221,9 +221,18 @@ public class ChallengeService {
         }
 
         ProgressOnChallengeResponseDto progress = ProgressOnChallengeResponseDto.builder()
-                .currentNumberOfSmallBottles(responseDto.getNumberOfSmallBottlesForJoinedChallenge())
-                .currentNumberOfMediumBottles(responseDto.getNumberOfMediumBottlesForJoinedChallenge())
-                .currentNumberOfLargeBottles(responseDto.getNumberOfLargeBottlesForJoinedChallenge())
+                .currentNumberOfSmallBottles(
+                        responseDto.getNumberOfSmallBottlesForJoinedChallenge() != null ?
+                                responseDto.getNumberOfSmallBottlesForJoinedChallenge() : 0
+                )
+                .currentNumberOfMediumBottles(
+                        responseDto.getNumberOfMediumBottlesForJoinedChallenge() != null ?
+                                responseDto.getNumberOfMediumBottlesForJoinedChallenge() : 0
+                )
+                .currentNumberOfLargeBottles(
+                        responseDto.getNumberOfLargeBottlesForJoinedChallenge() != null ?
+                                responseDto.getNumberOfLargeBottlesForJoinedChallenge() : 0
+                )
                 .challengeSubscriptionProgressStatus(challengeSubscriptionEntity.getChallengeSubscriptionProgressStatus())
                 .build();
 
