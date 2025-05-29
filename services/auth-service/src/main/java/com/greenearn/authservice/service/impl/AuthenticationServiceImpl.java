@@ -156,6 +156,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 codeConfirmationRepository.findByUserEntity(user);
         if (existCodeConfirmationEntity.isPresent()) {
             codeConfirmationRepository.delete(existCodeConfirmationEntity.get());
+            codeConfirmationRepository.flush();
         }
 
         CodeConfirmationEntity codeConfirmationEntity = new CodeConfirmationEntity(user);
