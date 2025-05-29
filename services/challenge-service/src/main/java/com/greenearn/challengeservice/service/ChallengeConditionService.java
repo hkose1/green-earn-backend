@@ -2,6 +2,7 @@ package com.greenearn.challengeservice.service;
 
 
 import com.greenearn.challengeservice.dto.ChallengeConditionDto;
+import com.greenearn.challengeservice.entity.ChallengeConditionEntity;
 import com.greenearn.challengeservice.mapper.ChallengeConditionMapper;
 import com.greenearn.challengeservice.repository.ChallengeConditionRepository;
 import jakarta.transaction.Transactional;

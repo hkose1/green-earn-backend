@@ -1,15 +1,19 @@
 package com.greenearn.challengeservice.service;
 
+import com.greenearn.challengeservice.client.AuthServiceClient;
 import com.greenearn.challengeservice.client.CustomerServiceClient;
 import com.greenearn.challengeservice.client.request.ProgressInformationRequestDto;
+import com.greenearn.challengeservice.client.request.UpdatePointsAfterCompletedChallengeRequestDto;
 import com.greenearn.challengeservice.client.response.ProgressInformationResponseDto;
 import com.greenearn.challengeservice.dto.*;
 import com.greenearn.challengeservice.entity.ChallengeConditionEntity;
 import com.greenearn.challengeservice.entity.ChallengeEntity;
 import com.greenearn.challengeservice.entity.ChallengeSubscriptionEntity;
 import com.greenearn.challengeservice.enums.ChallengeDuration;
+import com.greenearn.challengeservice.enums.ChallengeEventType;
 import com.greenearn.challengeservice.enums.ChallengeStatus;
 import com.greenearn.challengeservice.enums.ChallengeSubscriptionProgressStatus;
+import com.greenearn.challengeservice.event.ChallengeEvent;
 import com.greenearn.challengeservice.mapper.ChallengeConditionMapper;
 import com.greenearn.challengeservice.mapper.ChallengeMapper;
 import com.greenearn.challengeservice.repository.ChallengeRepository;
@@ -18,12 +22,14 @@ import com.greenearn.challengeservice.util.UserUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -37,6 +43,9 @@ public class ChallengeService {
     private final ChallengeConditionMapper challengeConditionMapper;
     private final ChallengeSubscriptionRepository challengeSubscriptionRepository;
     private final CustomerServiceClient customerServiceClient;
+    private final ChallengeConditionService challengeConditionService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final AuthServiceClient authServiceClient;
 
     @Transactional
     public void createChallenge(CreateChallengeRequestDto createChallengeRequestDto) {
@@ -150,11 +159,56 @@ public class ChallengeService {
                 "Bearer " + UserUtils.getCurrentUserToken(authentication)
         ).getBody();
 
-        return ProgressOnChallengeResponseDto.builder()
+        if (responseDto == null) {
+            throw new RuntimeException("Failed to get progress on challenge with id: " + challengeId);
+        }
+
+        ProgressOnChallengeResponseDto progress = ProgressOnChallengeResponseDto.builder()
                 .currentNumberOfSmallBottles(responseDto.getNumberOfSmallBottlesForJoinedChallenge())
                 .currentNumberOfMediumBottles(responseDto.getNumberOfMediumBottlesForJoinedChallenge())
                 .currentNumberOfLargeBottles(responseDto.getNumberOfLargeBottlesForJoinedChallenge())
+                .challengeSubscriptionProgressStatus(challengeSubscriptionEntity.getChallengeSubscriptionProgressStatus())
                 .build();
 
+        if (challengeSubscriptionEntity.getChallengeSubscriptionProgressStatus() == ChallengeSubscriptionProgressStatus.UN_COMPLETED) {
+            ChallengeConditionDto challengeConditionDto =
+                    challengeConditionService.getChallengeConditionByChallengeId(challengeId);
+            if (isChallengeCompleted(challengeConditionDto, progress)) {
+                challengeSubscriptionEntity.setChallengeSubscriptionProgressStatus(
+                        ChallengeSubscriptionProgressStatus.COMPLETED
+                );
+                challengeSubscriptionRepository.save(challengeSubscriptionEntity);
+                progress.setChallengeSubscriptionProgressStatus(
+                        ChallengeSubscriptionProgressStatus.COMPLETED
+                );
+                customerServiceClient.updatePointsAfterCompleteChallenge(
+                        UpdatePointsAfterCompletedChallengeRequestDto.builder()
+                                .earnedPointsAfterCompletedChallenge(challengeEntity.getReturnedPoints())
+                                .build(),
+                        "Bearer " + UserUtils.getCurrentUserToken(authentication)
+                );
+                eventPublisher.publishEvent(
+                        new ChallengeEvent(
+                                authServiceClient
+                                        .getCurrentUser("Bearer " + UserUtils.getCurrentUserToken(authentication))
+                                        .getBody().data(),
+                                challengeEntity,
+                                ChallengeEventType.COMPLETED,
+                                Map.of()
+                        )
+                );
+
+            }
+        }
+
+        return progress;
+
+    }
+
+    private boolean isChallengeCompleted(ChallengeConditionDto challengeConditionDto,
+                                             ProgressOnChallengeResponseDto progressDto) {
+        return (progressDto.getCurrentNumberOfSmallBottles() >= challengeConditionDto.getRequiredNumberOfSmallBottles())
+                && (progressDto.getCurrentNumberOfMediumBottles() >= challengeConditionDto.getRequiredNumberOfMediumBottles())
+                && (progressDto.getCurrentNumberOfLargeBottles() >= challengeConditionDto.getRequiredNumberOfLargeBottles());
     }
 }
