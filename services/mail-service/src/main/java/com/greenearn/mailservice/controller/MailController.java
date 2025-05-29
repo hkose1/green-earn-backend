@@ -1,6 +1,7 @@
 package com.greenearn.mailservice.controller;
 
 
+import com.greenearn.mailservice.dto.SendChallengeCompletedDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,11 @@ import com.greenearn.mailservice.service.MailService;
 public class MailController {
 
     private final MailService mailService;
+
+    @PostMapping("/send/challenge-completed")
+    public void sendChallengeCompletedMail(@RequestBody SendChallengeCompletedDto sendChallengeCompletedDto) {
+        mailService.sendChallengeCompletedMail(sendChallengeCompletedDto);
+    }
 
     @PostMapping("/send/account-verification/link")
     public void sendLinkAccountVerificationMail(@RequestBody SendTokenMailDto sendMailDto) {

@@ -1,5 +1,6 @@
 package com.greenearn.mailservice.service;
 
+import com.greenearn.mailservice.dto.SendChallengeCompletedDto;
 import com.greenearn.mailservice.dto.SendCodeMailDto;
 import com.greenearn.mailservice.dto.SendTokenMailDto;
 
@@ -12,4 +13,6 @@ public interface MailService {
     void sendCodeAccountVerificationMail(SendCodeMailDto sendMailDto);
 
     void sendCodeResetPasswordMail(SendCodeMailDto sendMailDto);
+
+    void sendChallengeCompletedMail(SendChallengeCompletedDto sendChallengeCompletedDto);
 }

@@ -1,5 +1,6 @@
 package com.greenearn.mailservice.service.impl;
 
+import com.greenearn.mailservice.dto.SendChallengeCompletedDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ public class MailServiceImpl implements MailService {
 
     private static final String NEW_USER_ACCOUNT_VERIFICATION = "New User Account Verification";
     private static final String PASSWORD_RESET_REQUEST = "Reset Password Request";
+    private static final String CHALLENGE_HAS_BEEN_COMPLETED = "Challenge has been completed";
     private final JavaMailSender mailSender;
 
     @Value("${spring.mail.verify.host}")
@@ -27,6 +29,21 @@ public class MailServiceImpl implements MailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
+    @Override
+    @Async
+    public void sendChallengeCompletedMail(SendChallengeCompletedDto sendMailDto) {
+        try {
+            var message = new SimpleMailMessage();
+            message.setSubject(CHALLENGE_HAS_BEEN_COMPLETED);
+            message.setFrom(fromEmail);
+            message.setTo(sendMailDto.getTo());
+            message.setText(MailUtils.getChallengeCompletedEmailMessage(sendMailDto));
+            mailSender.send(message);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException("Unable to send email for challenge completed", e);
+        }
+    }
 
     @Override
     @Async
