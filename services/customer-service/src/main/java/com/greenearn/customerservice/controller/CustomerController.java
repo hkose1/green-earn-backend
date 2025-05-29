@@ -45,6 +45,12 @@ public class CustomerController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public ResponseEntity<List<CustomerResponseDto>> getAllCustomersByUserIds(@RequestBody List<UUID> userIds) {
+        return ResponseEntity.ok(customerService.getAllCustomersByUserIds(userIds));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<CustomerResponseDto> getCustomerById(@PathVariable UUID id) {
         return ResponseEntity.ok(customerService.getCustomerById(id));

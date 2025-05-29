@@ -94,6 +94,18 @@ public class CustomerService {
         }
     }
 
+    public List<CustomerResponseDto> getAllCustomersByUserIds(List<UUID> userIds) {
+        try {
+            return customerRepository.findCustomerEntitiesByUserIdIs(userIds)
+                    .stream()
+                    .map(customerEntity -> customerMapper.map2ResponseDto(customerEntity))
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error while fetching all customers by user ids", e);
+            return new ArrayList<>();
+        }
+    }
+
     public CustomerResponseDto getCustomerById(UUID id) {
         return customerMapper.map2ResponseDto(
                 customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found with id: " + id))
