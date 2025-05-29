@@ -152,9 +152,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void resetPasswordRequest(ResetPasswordRequestDto resetPasswordRequestDto) {
         var user = getUserEntityByEmail(resetPasswordRequestDto.getEmail());
-        Optional<CodeConfirmationEntity> existCodeConfirmationEntity = codeConfirmationRepository.findByUserEntityId(user.getId());
+        Optional<CodeConfirmationEntity> existCodeConfirmationEntity =
+                codeConfirmationRepository.findByUserEntity(user);
         if (existCodeConfirmationEntity.isPresent()) {
-            codeConfirmationRepository.deleteByUserEntityId(user.getId());
+            codeConfirmationRepository.delete(existCodeConfirmationEntity.get());
         }
 
         CodeConfirmationEntity codeConfirmationEntity = new CodeConfirmationEntity(user);
