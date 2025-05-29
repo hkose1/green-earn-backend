@@ -27,23 +27,10 @@ public class BottleService {
     }
 
     public BottlePointsInfoResponseDto getBottlePointInfo() {
-        BottleEntity smallBottleEntity = new BottleEntity();
-        smallBottleEntity.setBottleSize(BottleSizeType.SMALL);
-        smallBottleEntity.setPoints(5);
-        bottleRepository.save(smallBottleEntity);
-        BottleEntity mediumBottleEntity = new BottleEntity();
-        mediumBottleEntity.setBottleSize(BottleSizeType.MEDIUM);
-        mediumBottleEntity.setPoints(10);
-        bottleRepository.save(mediumBottleEntity);
-        BottleEntity largeBottleEntity = new BottleEntity();
-        largeBottleEntity.setBottleSize(BottleSizeType.LARGE);
-        largeBottleEntity.setPoints(15);
-        bottleRepository.save(largeBottleEntity);
         return BottlePointsInfoResponseDto.builder()
                 .smallBottlePoints(getBottleBySizeType(BottleSizeType.SMALL).getPoints())
                 .mediumBottlePoints(getBottleBySizeType(BottleSizeType.MEDIUM).getPoints())
                 .largeBottlePoints(getBottleBySizeType(BottleSizeType.LARGE).getPoints())
                 .build();
-
     }
 }
