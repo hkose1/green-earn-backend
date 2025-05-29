@@ -28,6 +28,8 @@ spec:
               value: {{ $.Values.global.environment }}
             - name: SPRING_CLOUD_CONSUL_HOST
               value: "{{ $.Values.serviceRegistry.name }}"
+            - name: SPRING_JWT_SECRET
+              value: "{{ $.Values.secrets.jwtSecretInService }}"
             - name: SPRING_CLOUD_CONSUL_PORT
               value: "{{ $.Values.serviceRegistry.service.port }}"
             - name: SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER
