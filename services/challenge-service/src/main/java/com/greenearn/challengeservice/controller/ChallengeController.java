@@ -34,9 +34,23 @@ public class ChallengeController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{challengeId}")
+    public ResponseEntity<Void> updateChallenge(@PathVariable("challengeId") UUID challengeId ,
+                                                @RequestBody UpdateChallengeRequestDto updateChallengeRequestDto) {
+        challengeService.updateChallenge(challengeId, updateChallengeRequestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
     public ResponseEntity<List<ChallengeResponseAdminDto>> getAllChallengesAdmin() {
         return ResponseEntity.ok(challengeService.getAllChallengesForAdmin());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/{challengeId}")
+    public ResponseEntity<ChallengeResponseAdminDto> getChallengeByIdAdmin(@PathVariable("challengeId") UUID challengeId) {
+        return ResponseEntity.ok(challengeService.getChallengeByIdAdmin(challengeId));
     }
 
     @PostMapping("/subscribe")
@@ -49,6 +63,11 @@ public class ChallengeController {
     @GetMapping
     public ResponseEntity<List<ChallengeResponseDto>> getAllChallenges() {
         return ResponseEntity.ok(challengeService.getAllChallenges());
+    }
+
+    @GetMapping("/{challengeId}")
+    public ResponseEntity<ChallengeResponseDto> getChallengeById(@PathVariable("challengeId") UUID challengeId) {
+        return ResponseEntity.ok(challengeService.getChallengeById(challengeId));
     }
 
 }

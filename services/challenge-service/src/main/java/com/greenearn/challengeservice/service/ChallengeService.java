@@ -62,6 +62,50 @@ public class ChallengeService {
         }
     }
 
+    @Transactional
+    public void updateChallenge(UUID challengeId, UpdateChallengeRequestDto updateChallengeRequestDto) {
+        ChallengeEntity challengeEntity = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new RuntimeException("Challenge not found with id " + challengeId));
+
+        if (updateChallengeRequestDto.getChallengeCondition() != null) {
+            ChallengeConditionEntity challengeCondition = challengeEntity.getChallengeCondition();
+            if (challengeCondition == null) {
+                challengeCondition = new ChallengeConditionEntity();
+                challengeCondition.setChallenge(challengeEntity);
+            }
+            if (updateChallengeRequestDto.getChallengeCondition().getRequiredNumberOfSmallBottles() != null) {
+                challengeCondition
+                        .setRequiredNumberOfSmallBottles(updateChallengeRequestDto.getChallengeCondition().getRequiredNumberOfSmallBottles());
+            }
+            if (updateChallengeRequestDto.getChallengeCondition().getRequiredNumberOfMediumBottles() != null) {
+                challengeCondition
+                        .setRequiredNumberOfMediumBottles(updateChallengeRequestDto.getChallengeCondition().getRequiredNumberOfMediumBottles());
+            }
+            if (updateChallengeRequestDto.getChallengeCondition().getRequiredNumberOfLargeBottles() != null) {
+                challengeCondition
+                        .setRequiredNumberOfLargeBottles(updateChallengeRequestDto.getChallengeCondition().getRequiredNumberOfLargeBottles());
+            }
+
+            challengeEntity.setChallengeCondition(challengeCondition);
+        }
+        if (updateChallengeRequestDto.getChallengeDuration() != null) {
+            challengeEntity.setChallengeDuration(updateChallengeRequestDto.getChallengeDuration());
+        }
+        if (updateChallengeRequestDto.getTitle() != null) {
+            challengeEntity.setTitle(updateChallengeRequestDto.getTitle());
+        }
+        if (updateChallengeRequestDto.getDescription() != null) {
+            challengeEntity.setDescription(updateChallengeRequestDto.getDescription());
+        }
+        if (updateChallengeRequestDto.getEndDate() != null) {
+            challengeEntity.setEndDate(updateChallengeRequestDto.getEndDate());
+        }
+        if (updateChallengeRequestDto.getReturnedPoints() != null) {
+            challengeEntity.setReturnedPoints(updateChallengeRequestDto.getReturnedPoints());
+        }
+        challengeRepository.save(challengeEntity);
+    }
+
     public List<ChallengeResponseAdminDto> getAllChallengesForAdmin() {
         try {
             List<ChallengeResponseAdminDto> challengeResponseAdminDtoList = challengeRepository.findAll()
@@ -75,6 +119,13 @@ public class ChallengeService {
         }
     }
 
+    public ChallengeResponseAdminDto getChallengeByIdAdmin(UUID challengeId) {
+        return challengeMapper.mapEntity2ResponseAdminDto(
+                challengeRepository.findById(challengeId)
+                        .orElseThrow(() -> new RuntimeException("Failed to find challenge with id: " + challengeId))
+        );
+    }
+
     public List<ChallengeResponseDto> getAllChallenges() {
         try {
             List<ChallengeResponseDto> challengeResponseDtoList = challengeRepository.findAll()
@@ -86,6 +137,13 @@ public class ChallengeService {
             log.error("Failed to get all challenges", e);
             return new ArrayList<>();
         }
+    }
+
+    public ChallengeResponseDto getChallengeById(UUID challengeId) {
+        return challengeMapper.mapEntity2ResponseDto(
+                challengeRepository.findById(challengeId)
+                        .orElseThrow(() -> new RuntimeException("Failed to find challenge with id: " + challengeId))
+        );
     }
 
     public void subscribe(Authentication authentication, SubscribeToChallengeRequestDto subscribeRequestDto) {
