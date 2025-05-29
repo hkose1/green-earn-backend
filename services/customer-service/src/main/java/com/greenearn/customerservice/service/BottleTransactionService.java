@@ -4,6 +4,7 @@ package com.greenearn.customerservice.service;
 import com.greenearn.customerservice.dto.BottleTransactionRequestDto;
 import com.greenearn.customerservice.dto.BottleTransactionResponseDto;
 import com.greenearn.customerservice.dto.PublicCustomerResponseDto;
+import com.greenearn.customerservice.dto.projection.DailyPointProjectionDto;
 import com.greenearn.customerservice.dto.projection.TopCustomerDto;
 import com.greenearn.customerservice.entity.BottleTransactionEntity;
 import com.greenearn.customerservice.entity.CustomerEntity;
@@ -19,9 +20,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
@@ -128,4 +130,36 @@ public class BottleTransactionService {
             throw new RuntimeException("Error while fetching top 5 customers last month", e);
         }
     }
+
+    public Map<LocalDate, Integer> getWeeklyPointsByCustomer(Authentication authentication, String clientTimeZone) {
+        UUID customerId = currentCustomerService.getCurrentCustomerId(authentication);
+
+        LocalDate today = LocalDate.now(ZoneId.of(clientTimeZone));
+        LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
+
+        ZonedDateTime startOfWeekZoned = startOfWeek.atStartOfDay(ZoneId.of(clientTimeZone));
+        LocalDateTime startOfWeekUtc = startOfWeekZoned.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+
+        ZonedDateTime startOfTomorrowZoned = today.plusDays(1).atStartOfDay(ZoneId.of(clientTimeZone));
+        LocalDateTime endOfTodayUtc = startOfTomorrowZoned.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+
+        List<DailyPointProjectionDto> rawResults = bottleTransactionRepository.findWeeklyPointsByCustomer(
+                customerId, startOfWeekUtc, endOfTodayUtc, clientTimeZone);
+
+        Map<LocalDate, Integer> resultMap = rawResults.stream()
+                .collect(Collectors.toMap(
+                        DailyPointProjectionDto::getDate,
+                        DailyPointProjectionDto::getTotalPoints
+                ));
+
+        Map<LocalDate, Integer> completeWeekMap = new LinkedHashMap<>();
+        long daysBetween = ChronoUnit.DAYS.between(startOfWeek, today);
+        for (int i = 0; i <= daysBetween; i++) {
+            LocalDate day = startOfWeek.plusDays(i);
+            completeWeekMap.put(day, resultMap.getOrDefault(day, 0));
+        }
+
+        return completeWeekMap;
+    }
+
 }

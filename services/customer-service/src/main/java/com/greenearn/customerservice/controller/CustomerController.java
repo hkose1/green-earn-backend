@@ -19,7 +19,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -126,5 +128,11 @@ public class CustomerController {
     @GetMapping("/statistics/on-bottle-transactions/top-customers")
     public ResponseEntity<List<PublicCustomerResponseDto>> getTopCustomersOnBottleTransactions() {
         return ResponseEntity.ok(bottleTransactionService.getTop5CustomersLastMonth());
+    }
+
+    @GetMapping("/statistics/on-bottle-transactions/current-week")
+    public ResponseEntity<Map<LocalDate, Integer>> getWeeklyPointsByCustomer(Authentication authentication,
+                                                                             @RequestParam(name = "timezone", defaultValue = "UTC") String clientTimeZone) {
+        return ResponseEntity.ok(bottleTransactionService.getWeeklyPointsByCustomer(authentication, clientTimeZone));
     }
 }

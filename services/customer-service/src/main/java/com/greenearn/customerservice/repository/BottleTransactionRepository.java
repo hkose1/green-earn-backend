@@ -1,5 +1,6 @@
 package com.greenearn.customerservice.repository;
 
+import com.greenearn.customerservice.dto.projection.DailyPointProjectionDto;
 import com.greenearn.customerservice.dto.projection.TopCustomerDto;
 import com.greenearn.customerservice.entity.BottleTransactionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,19 @@ public interface BottleTransactionRepository extends JpaRepository<BottleTransac
             LIMIT 5
     """, nativeQuery = true)
     List<TopCustomerDto> findTop5CustomersSince(@Param("startDate") LocalDateTime startDate);
+
+    @Query(value = """
+    SELECT 
+        (bt.created_at AT TIME ZONE 'UTC' AT TIME ZONE :clientTimeZone)::date AS date,
+        COALESCE(SUM(bt.earned_points), 0) AS totalPoints
+    FROM bottle_transactions bt
+    WHERE bt.customer_id = :customerId
+      AND bt.created_at >= :startOfWeek
+      AND bt.created_at <= :endOfToday
+    GROUP BY date
+    ORDER BY date
+    """, nativeQuery = true)
+    List<DailyPointProjectionDto> findWeeklyPointsByCustomer(UUID customerId, LocalDateTime startOfWeek,
+                                                             LocalDateTime endOfToday,
+                                                             String clientTimeZone);
 }
