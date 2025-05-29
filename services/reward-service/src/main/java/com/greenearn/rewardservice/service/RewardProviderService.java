@@ -4,6 +4,7 @@ import com.greenearn.rewardservice.dto.CreateRewardProviderRequestDto;
 import com.greenearn.rewardservice.dto.RewardProviderResponseDto;
 import com.greenearn.rewardservice.entity.RewardEntity;
 import com.greenearn.rewardservice.entity.RewardProviderEntity;
+import com.greenearn.rewardservice.entity.RewardTransactionEntity;
 import com.greenearn.rewardservice.mapper.RewardMapper;
 import com.greenearn.rewardservice.mapper.RewardProviderMapper;
 import com.greenearn.rewardservice.repository.RewardProviderRepository;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +47,7 @@ public class RewardProviderService {
 
     public List<RewardProviderResponseDto> getAllRewardProviders() {
         return rewardProviderRepository.findAll().stream()
+                .sorted(Comparator.comparing(RewardProviderEntity::getCreatedAt).reversed())
                 .map(rewardProvider -> RewardProviderMapper.map2ResponseDto(rewardProvider))
                 .toList();
     }

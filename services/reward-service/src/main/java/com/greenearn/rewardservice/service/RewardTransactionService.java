@@ -1,6 +1,7 @@
 package com.greenearn.rewardservice.service;
 
 import com.greenearn.rewardservice.dto.RewardTransactionResponseDto;
+import com.greenearn.rewardservice.entity.RewardTransactionEntity;
 import com.greenearn.rewardservice.mapper.RewardTransactionMapper;
 import com.greenearn.rewardservice.repository.RewardTransactionRepository;
 import jakarta.transaction.Transactional;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +24,7 @@ public class RewardTransactionService {
 
     public List<RewardTransactionResponseDto> getALlRewardTransactions() {
         return rewardTransactionRepository.findAll().stream()
+                .sorted(Comparator.comparing(RewardTransactionEntity::getCreatedAt).reversed())
                 .map(rewardTransaction -> RewardTransactionMapper.map2ResponseDto(rewardTransaction))
                 .toList();
     }
@@ -37,6 +40,7 @@ public class RewardTransactionService {
     public List<RewardTransactionResponseDto> getMyAllRewardTransactions(Authentication authentication) {
         UUID userId = UtilService.getLoggedInUserId(authentication);
         return rewardTransactionRepository.findAllByUserId(userId).stream()
+                .sorted(Comparator.comparing(RewardTransactionEntity::getCreatedAt).reversed())
                 .map(rewardTransaction -> RewardTransactionMapper.map2ResponseDto(rewardTransaction))
                 .toList();
     }

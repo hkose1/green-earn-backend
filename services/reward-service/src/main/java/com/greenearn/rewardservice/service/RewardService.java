@@ -10,6 +10,7 @@ import com.greenearn.rewardservice.entity.RewardProviderEntity;
 import com.greenearn.rewardservice.entity.RewardTransactionEntity;
 import com.greenearn.rewardservice.enums.RewardTransactionStatus;
 import com.greenearn.rewardservice.mapper.RewardMapper;
+import com.greenearn.rewardservice.mapper.RewardTransactionMapper;
 import com.greenearn.rewardservice.repository.RewardProviderRepository;
 import com.greenearn.rewardservice.repository.RewardRepository;
 import com.greenearn.rewardservice.repository.RewardTransactionRepository;
@@ -22,6 +23,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,6 +48,7 @@ public class RewardService {
 
     public List<RewardResponseDto> getAllRewards() {
         return rewardRepository.findAll().stream()
+                .sorted(Comparator.comparing(RewardEntity::getCreatedAt).reversed())
                 .map(rewardEntity -> RewardMapper.map2ResponseDto(rewardEntity))
                 .toList();
     }
