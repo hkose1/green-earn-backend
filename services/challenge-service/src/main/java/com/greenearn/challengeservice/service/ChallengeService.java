@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-@Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
 @Slf4j
 public class ChallengeService {
@@ -187,7 +186,7 @@ public class ChallengeService {
     }
 
     private boolean isChallengeHasExpired(ChallengeEntity challengeEntity) {
-        return LocalDateTime.now().isAfter(challengeEntity.getCreatedAt());
+        return LocalDateTime.now().isAfter(challengeEntity.getEndDate());
     }
 
     public ProgressOnChallengeResponseDto getProgressOnChallenge(UUID challengeId, Authentication authentication) {
