@@ -75,7 +75,6 @@ authService:
     SPRING_DATASOURCE_PASSWORD: ${{ secrets.AZURE_POSTGRES_PASSWORD }}
     SPRING_JPA_HIBERNATE_DDL_AUTO: update
     SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
-    SPRING_JWT_SECRET: ${{ secrets.JWT_SECRET_IN_SERVICE }}
   livenessProbe:
     httpGet:
       path: /actuator/health
@@ -128,7 +127,6 @@ customerService:
     SPRING_DATASOURCE_PASSWORD: ${{ secrets.AZURE_POSTGRES_PASSWORD }}
     SPRING_JPA_HIBERNATE_DDL_AUTO: update
     SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
-    SPRING_JWT_SECRET: ${{ secrets.JWT_SECRET_IN_SERVICE }}
   livenessProbe:
     httpGet:
       path: /actuator/health
@@ -165,7 +163,6 @@ rewardService:
     SPRING_DATASOURCE_PASSWORD: ${{ secrets.AZURE_POSTGRES_PASSWORD }}
     SPRING_JPA_HIBERNATE_DDL_AUTO: update
     SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
-    SPRING_JWT_SECRET: ${{ secrets.JWT_SECRET_IN_SERVICE }}
   livenessProbe:
     httpGet:
       path: /actuator/health
@@ -202,7 +199,6 @@ challengeService:
     SPRING_DATASOURCE_PASSWORD: ${{ secrets.AZURE_POSTGRES_PASSWORD }}
     SPRING_JPA_HIBERNATE_DDL_AUTO: update
     SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
-    SPRING_JWT_SECRET: ${{ secrets.JWT_SECRET_IN_SERVICE }}
   livenessProbe:
     httpGet:
       path: /actuator/health
@@ -215,10 +211,6 @@ challengeService:
       port: 8085
     initialDelaySeconds: 90
     periodSeconds: 10
-
-secretsValues:
-  jwtSecretInKong: ${{ secrets.JWT_SECRET_IN_KONG }}
-  jwtSecretAlgorithm: ${{ secrets.JWT_SECRET_ALGORITHM }}
 
 elasticsearch:
   enabled: true
