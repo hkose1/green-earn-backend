@@ -82,6 +82,16 @@ data:
                 config:
                   secret_is_base64: true
                   key_claim_name: iss
+          - name: bottle-route
+            paths:
+              - /api/bottles
+            strip_path: false
+            preserve_host: false
+            plugins:
+              - name: jwt
+                config:
+                  secret_is_base64: true
+                  key_claim_name: iss
           - name: customer-swagger-ui
             paths:
               - /customer-service/swagger-ui
