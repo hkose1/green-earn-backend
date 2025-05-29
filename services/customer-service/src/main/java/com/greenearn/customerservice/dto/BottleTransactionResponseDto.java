@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -17,6 +18,7 @@ public class BottleTransactionResponseDto {
     private UUID id;
     private UUID customerId;
     private UUID containerId;
+    private LocalDateTime createdAt;
     private BottleTransactionStatus bottleTransactionStatus;
     private Integer numberOfSmallBottles;
     private Integer numberOfMediumBottles;
