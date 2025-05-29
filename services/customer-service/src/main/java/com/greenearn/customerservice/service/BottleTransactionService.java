@@ -16,10 +16,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
@@ -51,6 +48,7 @@ public class BottleTransactionService {
         try {
             return bottleTransactionRepository.findAll()
                     .stream()
+                    .sorted(Comparator.comparing(BottleTransactionEntity::getCreatedAt).reversed())
                     .map(bottleTransactionEntity -> bottleTransactionMapper.map2ResponseDto(bottleTransactionEntity))
                     .toList();
         } catch (Exception e) {
@@ -69,6 +67,7 @@ public class BottleTransactionService {
         try {
             return bottleTransactionRepository.findBottleTransactionEntitiesByCustomerId(customerId)
                     .stream()
+                    .sorted(Comparator.comparing(BottleTransactionEntity::getCreatedAt).reversed())
                     .map(bottleTransactionEntity -> bottleTransactionMapper.map2ResponseDto(bottleTransactionEntity))
                     .toList();
         } catch (Exception e) {
@@ -83,6 +82,7 @@ public class BottleTransactionService {
         try {
             return bottleTransactionRepository.findBottleTransactionEntitiesByCustomerId(customerId)
                     .stream()
+                    .sorted(Comparator.comparing(BottleTransactionEntity::getCreatedAt).reversed())
                     .map(bottleTransactionEntity -> bottleTransactionMapper.map2ResponseDto(bottleTransactionEntity))
                     .toList();
         } catch (Exception e) {

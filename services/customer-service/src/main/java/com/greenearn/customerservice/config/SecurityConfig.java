@@ -24,6 +24,7 @@ public class SecurityConfig {
     private String jwtSecret;
 
     private static final String[] PUBLIC_ENDPOINTS = {
+            "/api/bottles/**",
             "/actuator/health",
             "/actuator/**",
             "/swagger-ui/**",
