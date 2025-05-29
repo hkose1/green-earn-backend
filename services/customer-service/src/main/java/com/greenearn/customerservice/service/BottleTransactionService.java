@@ -3,10 +3,13 @@ package com.greenearn.customerservice.service;
 
 import com.greenearn.customerservice.dto.BottleTransactionRequestDto;
 import com.greenearn.customerservice.dto.BottleTransactionResponseDto;
+import com.greenearn.customerservice.dto.PublicCustomerResponseDto;
+import com.greenearn.customerservice.dto.projection.TopCustomerDto;
 import com.greenearn.customerservice.entity.BottleTransactionEntity;
 import com.greenearn.customerservice.entity.CustomerEntity;
 import com.greenearn.customerservice.enums.BottleTransactionStatus;
 import com.greenearn.customerservice.mapper.BottleTransactionMapper;
+import com.greenearn.customerservice.mapper.CustomerMapper;
 import com.greenearn.customerservice.repository.BottleTransactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -28,6 +33,7 @@ public class BottleTransactionService {
     private final CustomerService customerService;
     private final CurrentCustomerService currentCustomerService;
     private final BottleTransactionMapper bottleTransactionMapper;
+    private final CustomerMapper customerMapper;
 
 
     public void createBottleTransaction(BottleTransactionRequestDto bottleTransactionRequestDto, Authentication authentication) {
@@ -99,5 +105,27 @@ public class BottleTransactionService {
             throw new AccessDeniedException("You do not have permission to access this bottle transaction.");
         }
         return bottleTransactionMapper.map2ResponseDto(bottleTransactionEntity);
+    }
+
+    public List<PublicCustomerResponseDto> getTop5CustomersLastMonth() {
+        try {
+            LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+            List<TopCustomerDto> topCustomers = bottleTransactionRepository.findTop5CustomersSince(startOfMonth);
+
+            return topCustomers.stream()
+                    .map(topCustomerDto -> {
+                        PublicCustomerResponseDto publicCustomerResponseDto =
+                                customerMapper.map2PublicResponseDto(
+                                        customerService.getCustomerById(topCustomerDto.getCustomerId())
+                                );
+                        publicCustomerResponseDto.setTotalPoints(topCustomerDto.getTotalPoints());
+                        return publicCustomerResponseDto;
+                    })
+                    .sorted(Comparator.comparing(PublicCustomerResponseDto::getTotalPoints).reversed())
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error while fetching top 5 customers last month", e);
+            throw new RuntimeException("Error while fetching top 5 customers last month", e);
+        }
     }
 }

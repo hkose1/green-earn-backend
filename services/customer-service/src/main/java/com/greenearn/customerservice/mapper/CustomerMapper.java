@@ -3,6 +3,7 @@ package com.greenearn.customerservice.mapper;
 import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
 import com.greenearn.customerservice.dto.CustomerPointDto;
 import com.greenearn.customerservice.dto.CustomerResponseDto;
+import com.greenearn.customerservice.dto.PublicCustomerResponseDto;
 import com.greenearn.customerservice.entity.CustomerEntity;
 import com.greenearn.customerservice.entity.CustomerPointEntity;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,14 @@ public class CustomerMapper {
                 .profileImageUrl(customerEntity.getProfileImageUrl())
                 .userId(customerEntity.getUserId())
                 .customerPointDto(mapCustomerPointToDto(customerEntity.getCustomerPoint()))
+                .build();
+    }
+
+    public PublicCustomerResponseDto map2PublicResponseDto(CustomerResponseDto customerResponseDto) {
+        return PublicCustomerResponseDto.builder()
+                .profileImageUrl(customerResponseDto.getProfileImageUrl())
+                .firstName(customerResponseDto.getFirstName())
+                .lastName(customerResponseDto.getLastName())
                 .build();
     }
 }

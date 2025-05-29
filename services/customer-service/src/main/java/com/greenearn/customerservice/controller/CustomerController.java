@@ -5,10 +5,8 @@ import com.greenearn.customerservice.client.request.ProgressInformationRequestDt
 import com.greenearn.customerservice.client.request.UpdatePointsAfterCompletedChallengeRequestDto;
 import com.greenearn.customerservice.client.response.ProgressInformationResponseDto;
 import com.greenearn.customerservice.client.response.UpdateCustomerPointsResponseDto;
-import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
-import com.greenearn.customerservice.dto.CustomerResponseDto;
-import com.greenearn.customerservice.dto.InternalUpdateCustomerRequestDto;
-import com.greenearn.customerservice.dto.UpdateCustomerRequestDto;
+import com.greenearn.customerservice.dto.*;
+import com.greenearn.customerservice.service.BottleTransactionService;
 import com.greenearn.customerservice.service.CurrentCustomerService;
 import com.greenearn.customerservice.service.CustomerService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -32,6 +30,7 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final CurrentCustomerService currentCustomerService;
+    private final BottleTransactionService bottleTransactionService;
 
     @GetMapping("/me")
     public ResponseEntity<CustomerResponseDto> getCurrentCustomer(Authentication authentication) {
@@ -122,5 +121,10 @@ public class CustomerController {
     ) {
         customerService.internalUpdateCurrentCustomer(authentication, internalUpdateCustomerRequestDto);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/statistics/on-bottle-transactions/top-customers")
+    public ResponseEntity<List<PublicCustomerResponseDto>> getTopCustomersOnBottleTransactions() {
+        return ResponseEntity.ok(bottleTransactionService.getTop5CustomersLastMonth());
     }
 }
