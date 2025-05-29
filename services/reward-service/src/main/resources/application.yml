@@ -65,7 +65,7 @@ logging:
     org.springframework.security: DEBUG
 
 jwt:
-  secret: "3V5+VVj6mnxtvejvkDXX9dD5Wb4trRHTs3wCph276Bn00JHoODjN8C32FPIqpfBFpcLWA67GKbMz7dA18EcnTfxaLXFilehZfqxcgPPmuzS4VUXpepO7HP4V0gMcCFZ5UB5zCoMNalfIqqQyAxQBYuGvrl7Pwg5ZjFmz4iO4GLyuIbSdNcexy9TsO8PT09Fx7tMHswp8Okd1ryvtrouZ64iOyqENqvmOTL+Op7apwYqVCs95ZWVg4Gq3dmgCQRBQHmTlUHr/7HnZ/MBrMk6a5r/r8w+3TNT3MF/b3m8hlemFwQSUvO3hNhnsooz1JuHYkwaQKUQ8+Q3VUkrRuKPsVs7wMcEqWNpoDoSy+pcZcqc="
+  secret: ${SPRING_JWT_SECRET}
 
 gateway:
   url: http://4.157.140.60:8000
