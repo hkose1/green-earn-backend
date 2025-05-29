@@ -2,6 +2,7 @@ package com.greenearn.customerservice.controller;
 
 
 import com.greenearn.customerservice.client.request.ProgressInformationRequestDto;
+import com.greenearn.customerservice.client.request.UpdatePointsAfterCompletedChallengeRequestDto;
 import com.greenearn.customerservice.client.response.ProgressInformationResponseDto;
 import com.greenearn.customerservice.client.response.UpdateCustomerPointsResponseDto;
 import com.greenearn.customerservice.dto.CreateCustomerRequestDto;
@@ -88,6 +89,14 @@ public class CustomerController {
     public ResponseEntity<Void> updateMyPoints(@RequestBody UpdateCustomerPointsResponseDto updateDto,
                                                Authentication authentication) {
         customerService.updateMyPoints(authentication, updateDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Hidden
+    @PostMapping("/internal/me/challenge-completed/points/update")
+    public ResponseEntity<Void> updateMyPointsAfterCompleteChallenge(@RequestBody UpdatePointsAfterCompletedChallengeRequestDto updateDto,
+                                               Authentication authentication) {
+        customerService.updateMyPointsAfterCompleteChallenge(authentication, updateDto);
         return ResponseEntity.ok().build();
     }
 

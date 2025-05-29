@@ -3,6 +3,7 @@ package com.greenearn.customerservice.service;
 
 import com.greenearn.customerservice.client.enums.ChallengeDuration;
 import com.greenearn.customerservice.client.request.ProgressInformationRequestDto;
+import com.greenearn.customerservice.client.request.UpdatePointsAfterCompletedChallengeRequestDto;
 import com.greenearn.customerservice.client.response.ProgressInformationResponseDto;
 import com.greenearn.customerservice.client.response.UpdateCustomerPointsResponseDto;
 import com.greenearn.customerservice.dto.*;
@@ -138,6 +139,15 @@ public class CustomerService {
         CustomerEntity customer = currentCustomerService.getCurrentCustomer(authentication);
         final Integer customerTotalPoints = customer.getCustomerPoint().getTotalPoints();
         customer.getCustomerPoint().setTotalPoints(customerTotalPoints - updateDto.getTotalCostPoints());
+        customerRepository.save(customer);
+    }
+
+    @Transactional
+    public void updateMyPointsAfterCompleteChallenge(Authentication authentication,
+                                                     UpdatePointsAfterCompletedChallengeRequestDto updateDto) {
+        CustomerEntity customer = currentCustomerService.getCurrentCustomer(authentication);
+        final Integer customerTotalPoints = customer.getCustomerPoint().getTotalPoints();
+        customer.getCustomerPoint().setTotalPoints(customerTotalPoints + updateDto.getEarnedPointsAfterCompletedChallenge());
         customerRepository.save(customer);
     }
 
