@@ -68,7 +68,7 @@ public interface BottleTransactionRepository extends JpaRepository<BottleTransac
             String clientTimeZone
     );
 
-@Query(value = """
+    @Query(value = """
     WITH monthly_stats AS (
         SELECT 
             (SELECT COUNT(*) FROM customers) AS totalCustomers,
