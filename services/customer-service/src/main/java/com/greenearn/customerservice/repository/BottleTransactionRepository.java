@@ -2,6 +2,7 @@ package com.greenearn.customerservice.repository;
 
 import com.greenearn.customerservice.dto.projection.DailyBottleStatsProjectionDto;
 import com.greenearn.customerservice.dto.projection.DailyPointProjectionDto;
+import com.greenearn.customerservice.dto.projection.MonthlyStatsDto;
 import com.greenearn.customerservice.dto.projection.TopCustomerDto;
 import com.greenearn.customerservice.entity.BottleTransactionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -66,4 +67,68 @@ public interface BottleTransactionRepository extends JpaRepository<BottleTransac
             LocalDateTime endOfToday,
             String clientTimeZone
     );
+
+@Query(value = """
+    WITH monthly_stats AS (
+        SELECT 
+            (SELECT COUNT(*) FROM customers) AS totalCustomers,
+            -- Son bir ay içinde kayıt olan müşteri sayısı
+            (SELECT COUNT(*) FROM customers 
+             WHERE created_at >= :startOfMonth 
+             AND created_at <= :endOfToday) AS newCustomers,
+            COALESCE(SUM(CASE 
+                WHEN bt.created_at >= :startOfMonth 
+                AND bt.created_at <= :endOfToday 
+                THEN bt.number_of_small_bottles 
+                ELSE 0 
+            END), 0) AS monthlySmallBottles,
+            COALESCE(SUM(CASE 
+                WHEN bt.created_at >= :startOfMonth 
+                AND bt.created_at <= :endOfToday 
+                THEN bt.number_of_medium_bottles 
+                ELSE 0 
+            END), 0) AS monthlyMediumBottles,
+            COALESCE(SUM(CASE 
+                WHEN bt.created_at >= :startOfMonth 
+                AND bt.created_at <= :endOfToday 
+                THEN bt.number_of_large_bottles 
+                ELSE 0 
+            END), 0) AS monthlyLargeBottles,
+            COALESCE(SUM(CASE 
+                WHEN bt.created_at >= :startOfMonth 
+                AND bt.created_at <= :endOfToday 
+                THEN bt.earned_points 
+                ELSE 0 
+            END), 0) AS monthlyPoints
+        FROM bottle_transactions bt
+    ),
+    previous_stats AS (
+        SELECT 
+            COALESCE(SUM(bt.number_of_small_bottles), 0) AS totalSmallBottles,
+            COALESCE(SUM(bt.number_of_medium_bottles), 0) AS totalMediumBottles,
+            COALESCE(SUM(bt.number_of_large_bottles), 0) AS totalLargeBottles,
+            COALESCE(SUM(bt.earned_points), 0) AS totalPoints
+        FROM bottle_transactions bt
+        WHERE bt.created_at < :startOfMonth
+          AND bt.bottle_transaction_status = 'SUCCESS'
+    )
+    SELECT 
+        ms.totalCustomers,
+        ms.newCustomers,
+        ms.monthlySmallBottles,
+        ms.monthlyMediumBottles,
+        ms.monthlyLargeBottles,
+        ms.monthlyPoints,
+        ps.totalSmallBottles,
+        ps.totalMediumBottles,
+        ps.totalLargeBottles,
+        ps.totalPoints
+    FROM monthly_stats ms
+    CROSS JOIN previous_stats ps
+    """, nativeQuery = true)
+    MonthlyStatsDto findMonthlyStats(
+            LocalDateTime startOfMonth,
+            LocalDateTime endOfToday
+    );
+
 }

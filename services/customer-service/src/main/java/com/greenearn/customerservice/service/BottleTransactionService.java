@@ -7,6 +7,7 @@ import com.greenearn.customerservice.dto.DailyBottleStats;
 import com.greenearn.customerservice.dto.PublicCustomerResponseDto;
 import com.greenearn.customerservice.dto.projection.DailyBottleStatsProjectionDto;
 import com.greenearn.customerservice.dto.projection.DailyPointProjectionDto;
+import com.greenearn.customerservice.dto.projection.MonthlyStatsDto;
 import com.greenearn.customerservice.dto.projection.TopCustomerDto;
 import com.greenearn.customerservice.entity.BottleTransactionEntity;
 import com.greenearn.customerservice.entity.CustomerEntity;
@@ -203,5 +204,21 @@ public class BottleTransactionService {
 
         return completeWeekMap;
     }
+
+
+    public MonthlyStatsDto getMonthlyStats(String clientTimeZone) {
+        LocalDate today = LocalDate.now(ZoneId.of(clientTimeZone));
+        LocalDate startOfMonth = today.minusMonths(1);
+
+        ZonedDateTime startOfMonthZoned = startOfMonth.atStartOfDay(ZoneId.of(clientTimeZone));
+        LocalDateTime startOfMonthUtc = startOfMonthZoned.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+
+        ZonedDateTime endOfTodayZoned = today.atTime(23, 59, 59, 999999999).atZone(ZoneId.of(clientTimeZone));
+        LocalDateTime endOfTodayUtc = endOfTodayZoned.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+
+        return bottleTransactionRepository.findMonthlyStats(startOfMonthUtc, endOfTodayUtc);
+    }
+
+
 
 }

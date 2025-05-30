@@ -6,6 +6,7 @@ import com.greenearn.customerservice.client.request.UpdatePointsAfterCompletedCh
 import com.greenearn.customerservice.client.response.ProgressInformationResponseDto;
 import com.greenearn.customerservice.client.response.UpdateCustomerPointsResponseDto;
 import com.greenearn.customerservice.dto.*;
+import com.greenearn.customerservice.dto.projection.MonthlyStatsDto;
 import com.greenearn.customerservice.service.BottleTransactionService;
 import com.greenearn.customerservice.service.CurrentCustomerService;
 import com.greenearn.customerservice.service.CustomerService;
@@ -141,5 +142,12 @@ public class CustomerController {
     public ResponseEntity<Map<LocalDate, DailyBottleStats>> getWeeklyBottleStats(
             @RequestParam(defaultValue = "UTC") String clientTimeZone) {
         return ResponseEntity.ok(bottleTransactionService.getWeeklyBottleStats(clientTimeZone));
+    }
+
+    @GetMapping("/admin/statistics/monthly-stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<MonthlyStatsDto> getMonthlyStats(
+            @RequestParam(defaultValue = "UTC") String clientTimeZone) {
+        return ResponseEntity.ok(bottleTransactionService.getMonthlyStats(clientTimeZone));
     }
 }
