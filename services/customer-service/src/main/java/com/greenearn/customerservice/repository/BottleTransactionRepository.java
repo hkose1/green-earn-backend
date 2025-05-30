@@ -71,7 +71,9 @@ public interface BottleTransactionRepository extends JpaRepository<BottleTransac
     @Query(value = """
     WITH monthly_stats AS (
         SELECT 
-            (SELECT COUNT(*) FROM customers) AS totalCustomers,
+            -- Bir ay öncesine kadar olan toplam müşteri sayısı
+            (SELECT COUNT(*) FROM customers 
+             WHERE created_at < :startOfMonth) AS totalCustomers,
             -- Son bir ay içinde kayıt olan müşteri sayısı
             (SELECT COUNT(*) FROM customers 
              WHERE created_at >= :startOfMonth 
