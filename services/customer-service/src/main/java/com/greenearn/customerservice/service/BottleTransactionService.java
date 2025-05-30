@@ -148,8 +148,8 @@ public class BottleTransactionService {
         ZonedDateTime startOfWeekZoned = startOfWeek.atStartOfDay(ZoneId.of(clientTimeZone));
         LocalDateTime startOfWeekUtc = startOfWeekZoned.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
 
-        ZonedDateTime startOfTomorrowZoned = today.plusDays(1).atStartOfDay(ZoneId.of(clientTimeZone));
-        LocalDateTime endOfTodayUtc = startOfTomorrowZoned.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        ZonedDateTime endOfTodayZoned = today.atTime(23, 59, 59, 999999999).atZone(ZoneId.of(clientTimeZone));
+        LocalDateTime endOfTodayUtc = endOfTodayZoned.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
 
         List<DailyPointProjectionDto> rawResults = bottleTransactionRepository.findWeeklyPointsByCustomer(
                 customerId, startOfWeekUtc, endOfTodayUtc, clientTimeZone);
