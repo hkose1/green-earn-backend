@@ -135,4 +135,11 @@ public class CustomerController {
                                                                              @RequestParam(name = "timezone", defaultValue = "UTC") String clientTimeZone) {
         return ResponseEntity.ok(bottleTransactionService.getWeeklyPointsByCustomer(authentication, clientTimeZone));
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/statistics/weekly-stats")
+    public ResponseEntity<Map<LocalDate, DailyBottleStats>> getWeeklyBottleStats(
+            @RequestParam(defaultValue = "UTC") String clientTimeZone) {
+        return ResponseEntity.ok(bottleTransactionService.getWeeklyBottleStats(clientTimeZone));
+    }
 }

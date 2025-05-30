@@ -3,7 +3,9 @@ package com.greenearn.customerservice.service;
 
 import com.greenearn.customerservice.dto.BottleTransactionRequestDto;
 import com.greenearn.customerservice.dto.BottleTransactionResponseDto;
+import com.greenearn.customerservice.dto.DailyBottleStats;
 import com.greenearn.customerservice.dto.PublicCustomerResponseDto;
+import com.greenearn.customerservice.dto.projection.DailyBottleStatsProjectionDto;
 import com.greenearn.customerservice.dto.projection.DailyPointProjectionDto;
 import com.greenearn.customerservice.dto.projection.TopCustomerDto;
 import com.greenearn.customerservice.entity.BottleTransactionEntity;
@@ -163,6 +165,40 @@ public class BottleTransactionService {
         for (int i = 0; i <= daysBetween; i++) {
             LocalDate day = startOfWeek.plusDays(i);
             completeWeekMap.put(day, resultMap.getOrDefault(day, 0));
+        }
+
+        return completeWeekMap;
+    }
+
+    public Map<LocalDate, DailyBottleStats> getWeeklyBottleStats(String clientTimeZone) {
+        LocalDate today = LocalDate.now(ZoneId.of(clientTimeZone));
+        LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
+
+        ZonedDateTime startOfWeekZoned = startOfWeek.atStartOfDay(ZoneId.of(clientTimeZone));
+        LocalDateTime startOfWeekUtc = startOfWeekZoned.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+
+        ZonedDateTime endOfTodayZoned = today.atTime(23, 59, 59, 999999999).atZone(ZoneId.of(clientTimeZone));
+        LocalDateTime endOfTodayUtc = endOfTodayZoned.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+
+        List<DailyBottleStatsProjectionDto> rawResults = bottleTransactionRepository.findWeeklyBottleStats(
+                startOfWeekUtc, endOfTodayUtc, clientTimeZone);
+
+        Map<LocalDate, DailyBottleStats> resultMap = rawResults.stream()
+                .collect(Collectors.toMap(
+                        DailyBottleStatsProjectionDto::getDate,
+                        dto -> new DailyBottleStats(
+                                dto.getTotalSmallBottles(),
+                                dto.getTotalMediumBottles(),
+                                dto.getTotalLargeBottles(),
+                                dto.getTotalPoints()
+                        )
+                ));
+
+        Map<LocalDate, DailyBottleStats> completeWeekMap = new LinkedHashMap<>();
+        long daysBetween = ChronoUnit.DAYS.between(startOfWeek, today);
+        for (int i = 0; i <= daysBetween; i++) {
+            LocalDate day = startOfWeek.plusDays(i);
+            completeWeekMap.put(day, resultMap.getOrDefault(day, new DailyBottleStats(0, 0, 0, 0)));
         }
 
         return completeWeekMap;
