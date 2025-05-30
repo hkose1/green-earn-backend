@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -17,6 +18,7 @@ public interface BottleTransactionRepository extends JpaRepository<BottleTransac
 
     List<BottleTransactionEntity> findBottleTransactionEntitiesByCustomerId(UUID customerId);
     List<BottleTransactionEntity> findByCustomerIdAndCreatedAtBetween(UUID customerId, LocalDateTime start, LocalDateTime end);
+    Optional<BottleTransactionEntity> findByQrCodeId(UUID qrCode);
 
     @Query(value = """
             SELECT customer_id AS customerId, SUM(earned_points) AS totalPoints

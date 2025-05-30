@@ -17,6 +17,8 @@ public class BottleTransactionRequestDto {
 
     @NotNull(message = "Container id cannot be null")
     private UUID containerId;
+    @NotNull(message = "QR code id cannot be null")
+    private UUID qrCodeId;
     private Integer points;
     private Integer numberOfSmallBottles;
     private Integer numberOfMediumBottles;

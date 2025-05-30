@@ -17,6 +17,7 @@ public class BottleTransactionMapper {
     public BottleTransactionEntity mapTransactionRequestDtoToEntity(BottleTransactionRequestDto bottleTransactionRequestDto, Authentication authentication) {
         return BottleTransactionEntity.builder()
                 .customerId(currentCustomerService.getCurrentCustomerId(authentication))
+                .qrCodeId(bottleTransactionRequestDto.getQrCodeId())
                 .containerId(bottleTransactionRequestDto.getContainerId())
                 .numberOfSmallBottles(bottleTransactionRequestDto.getNumberOfSmallBottles())
                 .numberOfMediumBottles(bottleTransactionRequestDto.getNumberOfMediumBottles())

@@ -19,6 +19,7 @@ import java.util.UUID;
 public class BottleTransactionEntity extends Auditable {
     private UUID customerId;
     private UUID containerId;
+    private UUID qrCodeId;
     @Enumerated(EnumType.STRING)
     private BottleTransactionStatus bottleTransactionStatus;
     private Integer numberOfSmallBottles;

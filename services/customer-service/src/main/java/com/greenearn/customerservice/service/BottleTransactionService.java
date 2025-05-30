@@ -38,7 +38,13 @@ public class BottleTransactionService {
     private final CustomerMapper customerMapper;
 
 
-    public void createBottleTransaction(BottleTransactionRequestDto bottleTransactionRequestDto, Authentication authentication) {
+    public void createBottleTransaction(BottleTransactionRequestDto bottleTransactionRequestDto,
+                                        Authentication authentication) {
+        Optional<BottleTransactionEntity> alreadyUsedTheQr =
+                bottleTransactionRepository.findByQrCodeId(bottleTransactionRequestDto.getQrCodeId());
+        if (alreadyUsedTheQr.isPresent()) {
+            throw new RuntimeException("The qr code already used for this transaction");
+        }
         BottleTransactionEntity bottleTransactionEntity = bottleTransactionMapper.mapTransactionRequestDtoToEntity(bottleTransactionRequestDto, authentication);
         try {
             bottleTransactionEntity.setBottleTransactionStatus(BottleTransactionStatus.SUCCESS);
