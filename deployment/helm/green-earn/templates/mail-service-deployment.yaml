@@ -39,9 +39,9 @@ spec:
         - name: EMAIL_PORT
           value: "587"
         - name: EMAIL_ID
-          value: "haydarkose86@gmail.com"
+          value: "emailaddress"
         - name: EMAIL_PASSWORD
-          value: "dsak ckgs tndd okee"
+          value: "email applications password"
         - name: VERIFY_EMAIL_HOST
           value: "http://4.157.140.60:8000"
         resources:
