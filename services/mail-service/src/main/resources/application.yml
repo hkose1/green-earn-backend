@@ -72,8 +72,8 @@ API_GATEWAY_PORT: 8000
 #Email Config
 EMAIL_HOST: smtp.gmail.com
 EMAIL_PORT: 587
-EMAIL_ID: haydarkose86@gmail.com
-EMAIL_PASSWORD: dsak ckgs tndd okee
+EMAIL_ID: emailaddress
+EMAIL_PASSWORD: email applications password
 VERIFY_EMAIL_HOST: http://4.157.140.60:${API_GATEWAY_PORT}
 server:
   port: ${SERVER_PORT}
